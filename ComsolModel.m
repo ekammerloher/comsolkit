@@ -62,7 +62,7 @@ classdef ComsolModel < handle % All copies are references to same object
             
             if isFromFile && isFromTag
                 error(['Can construct a %s object either from a file or '
-                       'a model on the server by tag'], 'ComsolModel');
+                       'a model on the server by tag.'], 'ComsolModel');
                    
             elseif isFromFile % Load from a file on the file system.
                 if isUnitDefined || isDimensionDefined
@@ -74,7 +74,7 @@ classdef ComsolModel < handle % All copies are references to same object
                     obj.model = ModelUtil.load(modelTag, ...
                                                p.Results.FromFile);
                 else
-                    error('Could not find the file %s', ...
+                    error('Could not find the file %s.', ...
                           p.Results.FromFile);
                 end
                 
@@ -89,7 +89,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 if isValidTag
                     obj.model = ModelUtil.model(p.Results.FromTag);
                 else
-                    error('Unknown model with tag %s', p.Results.FromTag);
+                    error('Unknown model with tag %s.', p.Results.FromTag);
                 end
                 
             else % Create a new model on the server.
@@ -114,9 +114,8 @@ classdef ComsolModel < handle % All copies are references to same object
             
             import com.comsol.model.*;
             
-            assert(ischar(newTag),'Tag must be a string');
+            assert(ischar(newTag),'Tag must be a string.');
             
-            % TODO: Do some checks on model or define get/set for model.
             obj.model.tag(newTag);
         end
         
@@ -125,7 +124,6 @@ classdef ComsolModel < handle % All copies are references to same object
             
             import com.comsol.model.*;
             
-            % TODO: Do some checks on model or define get/set for model.
             tag = char(obj.model.tag());
         end
         
@@ -134,32 +132,33 @@ classdef ComsolModel < handle % All copies are references to same object
             
             import com.comsol.model.*;
             
-            % TODO: Do some checks on model or define get/set for model.
             tagCell = cell(obj.model.geom().tags());
             
             assert(~isempty(tagCell), ...
-                'No geometry entities found in model %s.', obj.tag);
+                   'No geometry entities found in model %s.', obj.tag);
             
             geom = obj.model.geom().get(tagCell{1});
         end
         
         
-%         function model = get.model(obj)
-%             
-%             import com.comsol.model.*;
-%             
-%             % This is a bit of a hack, since I could not find a function to
-%             % test connectivity to the server. Calling any function, when
-%             % connection is lost results in an exception. Call a cheap
-%             % function for this.
-%             try
-%                 obj.model.isActive();
-%             catch
-%                 obj.model = [];
-%                 warning('Exception accessing the model object');
-%             end
-%             model = obj.model;
-%         end
+        function model = get.model(obj)
+            
+            import com.comsol.model.*;
+            
+            % This is a bit of a hack, since I could not find a function to
+            % test connectivity to the server. Calling any function, when
+            % connection is lost results in an exception. Call a cheap
+            % function for this.
+            try
+                obj.model.isActive();
+            catch
+                % TODO: inputname(1) fails to get object name.
+                error(['Exception accessing the model object. Call ' ...
+                       '%s.model to see the full java stacktrace.'], ...
+                       inputname(1));
+            end
+            model = obj.model;
+        end
         
         
         function set.lengthUnit(obj, unitValue)
@@ -177,7 +176,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 unitPair = obj.UNIT(logicIndex);
                 unitPair = unitPair{1}; % Is 1x1 cell of 1x2 cell.
                 
-                fprintf('Length unit set to %s\n', unitPair{1});
+                fprintf('Length unit set to %s.\n', unitPair{1});
                 obj.geom.lengthUnit(unitPair{1});
             else
                 warning(['Length %e m as a unit is not recognized. ' ...
@@ -200,7 +199,7 @@ classdef ComsolModel < handle % All copies are references to same object
             
             if sum(logicIndex) ~= 1 % Only one match should be possible.
                 error(['Unit %s is not well defined. Update UNITS with' ...
-                         ' the right string/value pair.'], unitString);
+                       ' the right string/value pair.'], unitString);
             end
 
             unitPair = obj.UNIT(logicIndex);
@@ -217,15 +216,20 @@ classdef ComsolModel < handle % All copies are references to same object
             % Call superclass delete method.
             delete@handle(obj);
             
-            deletedTag = obj.tag;
-            ModelUtil.remove(obj.tag); % Removes model from server.
-            
-            modelTagCell = cell(ModelUtil.tags());
-            isValidTag = ismember(deletedTag, modelTagCell);
-            
-            if isValidTag
+            try
+                deletedTag = obj.tag;
+                ModelUtil.remove(obj.tag); % Removes model from server.
+
+                modelTagCell = cell(ModelUtil.tags());
+                isValidTag = ismember(deletedTag, modelTagCell);
+
+                if isValidTag
+                    warning(['Could not delete model object from serv' ...
+                             'er. Model is accessed by another client.']);
+                end
+            catch
                 warning(['Could not delete model object from server. ' ...
-                        'Model is accessed by another client.']);
+                         'Connection lost?']);
             end
         end
         
@@ -248,7 +252,7 @@ classdef ComsolModel < handle % All copies are references to same object
 
                 delete(tmpFile); % Clean up.
             else
-                warning('Could not save comsol object');
+                warning('Could not save comsol object.');
             end
             savedObj = obj;
         end
@@ -264,7 +268,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 msg = sprintf('Model %s saved to %s.\n', ...
                     obj.tag, fileName);
             else
-                warning('Could not save comsol object');
+                warning('Could not save comsol object.');
             end
         end
         
