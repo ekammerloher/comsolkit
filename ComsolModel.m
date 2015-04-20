@@ -54,9 +54,10 @@ classdef ComsolModel < handle % All copies are references to same object
             
             p = inputParser();
             p.addParameter('LengthUnit', defaultLengthUnit, ...
-                           @(x) isnumeric(x) && x>0);
+                           @(x) isnumeric(x) && x>0 && length(x) == 1);
             p.addParameter('GeomDimension', defaultDimension, ...
-                           @(x) isnumeric(x) && x >= 1 && x <= 3);
+                           @(x) isnumeric(x) && x >= 1 && x <= 3 && ...
+                           length(x) == 1);
             p.addParameter('FromFile', '', @ischar);
             p.addParameter('FromTag', '', @ischar);
             

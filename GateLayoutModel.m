@@ -1,5 +1,5 @@
 classdef GateLayoutModel < comsolkit.LayeredModel
-    %LayeredModel Inherits from ComsolModel and adds layer functionality.
+    % GateLayoutModel Inherits from LayeredModel and adds gates.
     
     properties
     end

@@ -1,5 +1,5 @@
 classdef LayeredModel < comsolkit.ComsolModel
-    %LayeredModel Inherits from ComsolModel and adds layer functionality.
+    % LayeredModel Inherits from ComsolModel and adds layer functionality.
     
     properties
     end
@@ -22,4 +22,3 @@ classdef LayeredModel < comsolkit.ComsolModel
         end
     end
 end
-
