@@ -37,6 +37,14 @@ classdef ComsolModel < handle % All copies are references to same object
         % Check if tag exists by index > 0 on any ModelEntityList.
         
         function obj = ComsolModel(varargin)
+            % ComsolModel Creates a comsol model object.
+            %
+            %  Parameters:
+            %  FromFile: Load from a mph-file on the file system
+            %  FromTag: Load from an existing model on the server by tag
+            %  %%% parameters below only for new models %%%
+            %  LengthUnit: Length of a unit in meters (default: 1e-9)
+            %  GeomDimension: Dimensions of the model (default: 3)
             
             import com.comsol.model.*;
             import com.comsol.model.util.*;
@@ -137,6 +145,7 @@ classdef ComsolModel < handle % All copies are references to same object
             assert(~isempty(tagCell), ...
                    'No geometry entities found in model %s.', obj.tag);
             
+            % Use the first geometry in a possibly larger list.
             geom = obj.model.geom().get(tagCell{1});
         end
         
@@ -235,6 +244,7 @@ classdef ComsolModel < handle % All copies are references to same object
         
         
         function savedObj = saveobj(obj)
+            % saveobj Saves the object including the comsol model.
             
             import com.comsol.model.*;
             
@@ -314,6 +324,7 @@ classdef ComsolModel < handle % All copies are references to same object
     end
     methods(Static)
         function loadedObj = loadobj(obj)
+            % loadobj Loads the object including the comsol model.
             
             import com.comsol.model.*;
             import com.comsol.model.util.*;
