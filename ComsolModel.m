@@ -218,7 +218,7 @@ classdef ComsolModel < handle % All copies are references to same object
         
         
         function delete(obj)
-            % delete Removes the comsol object from the server.
+            % delete Removes the object (also from the server).
             
             import com.comsol.model.util.*;
             
