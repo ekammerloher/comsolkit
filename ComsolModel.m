@@ -41,6 +41,8 @@ classdef ComsolModel < handle % All copies are references to same object
         function obj = ComsolModel(varargin)
             % ComsolModel Creates a comsol model object.
             %
+            %  ComsolModel(varargin)
+            %
             %  Parameters:
             %  FromFile: Load from a mph-file on the file system
             %  FromTag: Load from an existing model on the server by tag
@@ -275,6 +277,8 @@ classdef ComsolModel < handle % All copies are references to same object
         
         function msg = save_mph(obj, fileName)
             % save_mph Saves the comsol model to a mph-file.
+            %
+            %  save_mph(obj, fileName)
             
             import com.comsol.model.*;
             
@@ -290,6 +294,8 @@ classdef ComsolModel < handle % All copies are references to same object
         
         function param = get_param(obj, paramName)
             % get_param Wrapper to get comsol model parameters.
+            %
+            %  get_param(obj, paramName)
             
             % Get all parameter names.
             paramCell = cell(obj.model.param.varnames());
@@ -305,6 +311,9 @@ classdef ComsolModel < handle % All copies are references to same object
         
         function set_param(obj, paramName, value, varargin)
             % set_param Wrapper to set comsol model parameters.
+            %
+            %  set_param(obj, paramName, value)
+            %  set_param(obj, paramName, value, description)
             
             if nargin > 3
                 obj.model.param.set(paramName, value, varargin{1});
@@ -317,6 +326,8 @@ classdef ComsolModel < handle % All copies are references to same object
         function modelEntity = get_or_create(~, modelEntityList, ...
                                              tag, varargin)
             % get_or_create Helper function to get/create an entity.
+            %
+            % get_or_create(obj, modelEntityList, tag, varargin)
             
             import com.comsol.model.*;
             

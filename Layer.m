@@ -23,6 +23,9 @@ classdef Layer < handle
         function obj = Layer(hModel, varargin)
             % Layer Creates a Layer object.
             %
+            %  Layer(hModel)
+            %  Layer(hModel, varargin)
+            %
             %  Parameters:
             %  hModel: Required handle to parent ComsolModel type object
             %  Name: Common name of workpane and the extrude feature.
