@@ -87,6 +87,9 @@ classdef Layer
         
         
         function extrude = get.extrude(obj)
+            
+            import com.comsol.model.*;
+            
             extrudeIndex = obj.hModel.geom.feature().index(obj.extrudeTag);
             
             if extrudeIndex < 0 % Is -1 when not in list.
@@ -99,6 +102,9 @@ classdef Layer
         
         
         function workPlane = get.workPlane(obj)
+            
+            import com.comsol.model.*;
+            
             % The extrude feature could have multiple workplanes as inputs.
             % Just assume one for our usecase.
             inputObjectCell = cell( ...
@@ -121,6 +127,9 @@ classdef Layer
         
         
         function selectionTag = get.selectionTag(obj)
+            
+            import com.comsol.model.*;
+            
             selectionCell = cell(obj.extrude.outputSelection());
             
             % Assume we are interested in domains. Their selection name is
@@ -137,6 +146,9 @@ classdef Layer
     
         
         function layerName = get.name(obj)
+            
+            import com.comsol.model.*;
+            
             layerName = char(obj.extrude.label());
             
             % Ensure the same name is set for the workplane.
@@ -145,6 +157,8 @@ classdef Layer
         
         
         function obj = set.name(obj, newName)
+            
+            import com.comsol.model.*;
             
             assert(ischar(newName) && ~isempty(newName), ...
                 'The new name %s is not valid.', newName);
@@ -155,11 +169,16 @@ classdef Layer
         
         
         function distance = get.distance(obj)
+            
+            import com.comsol.model.*;
+            
             distance = obj.extrude.getDoubleArray('distance');
         end
         
         
         function obj = set.distance(obj, newDistance)
+            
+            import com.comsol.model.*;
             
             assert(isnumeric(newDistance) && ~isempty(newDistance), ...
                    'The new distance is not valid.');
@@ -169,16 +188,32 @@ classdef Layer
         
         
         function zPosition = get.zPosition(obj)
+            
+            import com.comsol.model.*;
+            
             zPosition = obj.workPlane.getDouble('quickz');
         end
         
         
         function obj = set.zPosition(obj, newPosition)
             
+            import com.comsol.model.*;
+            
             assert(isnumeric(newPosition) && length(newPosition) == 1, ...
                    'The new position is not valid.');
             
             obj.workPlane.set('quickz', newPosition);
+        end
+        
+        
+        function delete(obj)
+            % delete Removes the workplane/extrude-feature from the model.
+            
+            import com.comsol.model.*;
+            
+            workplaneTag = obj.workPlane.tag();
+            obj.hModel.geom.feature().remove(obj.extrudeTag);
+            obj.hModel.geom.feature().remove(workplaneTag);
         end
     end
 end
