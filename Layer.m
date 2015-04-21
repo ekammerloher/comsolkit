@@ -12,6 +12,7 @@ classdef Layer < handle
     properties(Constant)
         BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
         BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext string for uniquetag.
+        WORKPLANE_NAME_PREFIX = 'wp_'; % Prefix of workplane label.
     end
     properties(Access=private)
         extrudeTag % Access extrude distance in extrude feature.
@@ -135,11 +136,11 @@ classdef Layer < handle
         end
     
         
-        function name = get.name(obj)
-            name = char(obj.extrude.label());
+        function layerName = get.name(obj)
+            layerName = char(obj.extrude.label());
             
             % Ensure the same name is set for the workplane.
-            obj.workPlane.label(name);
+            obj.workPlane.label([obj.WORKPLANE_NAME_PREFIX layerName]);
         end
         
         
@@ -149,7 +150,7 @@ classdef Layer < handle
                 'The new name %s is not valid.', newName);
             
             obj.extrude.label(newName);
-            obj.workPlane.label(name);
+            obj.workPlane.label([obj.WORKPLANE_NAME_PREFIX newName]);
         end
         
         
@@ -174,7 +175,7 @@ classdef Layer < handle
         
         function set.zPosition(obj, newPosition)
             
-            assert(isnumeric(newDistance) && length(newDistance) == 1, ...
+            assert(isnumeric(newPosition) && length(newPosition) == 1, ...
                    'The new position is not valid.');
             
             obj.workPlane.set('quickz', newPosition);

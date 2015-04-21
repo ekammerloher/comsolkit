@@ -161,6 +161,7 @@ classdef ComsolModel < handle % All copies are references to same object
             % test connectivity to the server. Calling any function, when
             % connection is lost results in an exception. Call a cheap
             % function for this.
+            % TODO: try isvalid()
             try
                 obj.model.isActive();
             catch
