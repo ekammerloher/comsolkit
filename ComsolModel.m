@@ -16,6 +16,8 @@ classdef ComsolModel < handle % All copies are references to same object
                   'm'], 1e-6}, ...
                 {'mm',1e-3}, ...
                 {'m',1}};
+        BASE_TAG_MODEL = 'Model'; % Base model string for uniquetag.
+        BASE_TAG_GEOM = 'geom'; % Base geom string for uniquetag.
     end
     properties(Transient)
         model % The com.comsol.clientapi.impl.ModelClient object.
@@ -79,7 +81,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 end
                 
                 if exist(p.Results.FromFile, 'file') == 2
-                    modelTag = ModelUtil.uniquetag('Model');
+                    modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                     obj.model = ModelUtil.load(modelTag, ...
                                                p.Results.FromFile);
                 else
@@ -102,11 +104,11 @@ classdef ComsolModel < handle % All copies are references to same object
                 end
                 
             else % Create a new model on the server.
-                modelTag = ModelUtil.uniquetag('Model');
+                modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                 obj.model = ModelUtil.create(modelTag);
                 
                 % Create the geometry with specified dimension.
-                geomTag = obj.model.geom().uniquetag('geom');
+                geomTag = obj.model.geom().uniquetag(obj.BASE_TAG_GEOM);
                 obj.model.geom().create(geomTag, p.Results.GeomDimension);
 
                 obj.lengthUnit = p.Results.LengthUnit;
@@ -340,7 +342,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 fclose(fid);
                 
                 % Load mph file with a new tag.
-                modelTag = ModelUtil.uniquetag('Model');
+                modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                 obj.model = ModelUtil.load(modelTag, tmpFile);
                 
                 delete(tmpFile); % Clean up.

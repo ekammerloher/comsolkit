@@ -10,8 +10,8 @@ classdef Layer
         selectionTag % Tag of the extrude domain selection feature.
     end
     properties(Constant)
-        BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp name for uniquetag.
-        BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext name for uniquetag.
+        BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
+        BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext string for uniquetag.
     end
     properties(Access=private)
         extrudeTag % Access extrude distance in extrude feature.
