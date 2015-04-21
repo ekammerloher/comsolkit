@@ -98,13 +98,24 @@ classdef Layer < handle
         
         
         function workPlane = get.workPlane(obj)
+            % The extrude feature could have multiple workplanes as inputs.
+            % Just assume one for our usecase.
             inputObjectCell = cell( ...
                 obj.extrude.selection('input').objects());
-           
-            % The extrude feature could have multiple workplanes as inputs.
-            for inputObject = inputObjectCell
-                workPlane(end+1) = obj.hModel.geom.feature(inputObject);
+            
+            if length(inputObjectCell) ~= 1
+                error(['Layer expects one workplane for the extrude ' ...
+                       'feature. Found %d.'], length(inputObjectCell));
             end
+            
+            workplaneIndex = ...
+                obj.hModel.geom.feature().index(inputObjectCell{1});
+            
+            if workplaneIndex < 0
+                error('Could not find workplane %s.', inputObjectCell{1});
+            end
+            
+            workPlane = obj.hModel.geom.feature( inputObjectCell{1});
         end
         
         
@@ -127,10 +138,8 @@ classdef Layer < handle
         function name = get.name(obj)
             name = char(obj.extrude.label());
             
-            % Ensure the same name is set for the workplanes.
-            for workPlane = obj.workPlane
-                workPlane.label(name);
-            end
+            % Ensure the same name is set for the workplane.
+            obj.workPlane.label(name);
         end
         
         
@@ -140,11 +149,7 @@ classdef Layer < handle
                 'The new name %s is not valid.', newName);
             
             obj.extrude.label(newName);
-            
-            % Ensure the same name is set for the workplanes.
-            for workPlane = obj.workPlane
-                workPlane.label(name);
-            end
+            obj.workPlane.label(name);
         end
         
         
@@ -163,31 +168,16 @@ classdef Layer < handle
         
         
         function zPosition = get.zPosition(obj)
-            
-            zPosition = [];
-            
-            for workPlane = obj.workPlane
-                zPosition(end+1) = workPlane.getDouble('quickz');
-            end
+            zPosition = obj.workPlane.getDouble('quickz');
         end
         
         
         function set.zPosition(obj, newPosition)
             
-            assert(isnumeric(newDistance) && ~isempty(newDistance), ...
+            assert(isnumeric(newDistance) && length(newDistance) == 1, ...
                    'The new position is not valid.');
             
-            if length(newDistance) == length(obj.workPlane)
-                for i = 1:length(obj.workPlane)
-                    obj.workPlane(i).set('quickz', newPosition(i));
-                end
-            else
-                warning(['New distance value has not the same size as ' ...
-                         'the workPlane. Using first distance for all']);
-                for workPlane = obj.workPlane
-                    workPlane.set('quickz', newPosition(1));
-                end
-            end
+            obj.workPlane.set('quickz', newPosition);
         end
     end
 end
