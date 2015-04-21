@@ -1,4 +1,4 @@
-classdef Layer < handle
+classdef Layer
     % Layer Bundles a comsol workplane and an extrude feature into an unit.
     
     properties(Dependent)
@@ -144,7 +144,7 @@ classdef Layer < handle
         end
         
         
-        function set.name(obj, newName)
+        function obj = set.name(obj, newName)
             
             assert(ischar(newName) && ~isempty(newName), ...
                 'The new name %s is not valid.', newName);
@@ -159,7 +159,7 @@ classdef Layer < handle
         end
         
         
-        function set.distance(obj, newDistance)
+        function obj = set.distance(obj, newDistance)
             
             assert(isnumeric(newDistance) && ~isempty(newDistance), ...
                    'The new distance is not valid.');
@@ -173,7 +173,7 @@ classdef Layer < handle
         end
         
         
-        function set.zPosition(obj, newPosition)
+        function obj = set.zPosition(obj, newPosition)
             
             assert(isnumeric(newPosition) && length(newPosition) == 1, ...
                    'The new position is not valid.');
