@@ -27,16 +27,10 @@ classdef ComsolModel < handle % All copies are references to same object
     end
     
     methods
-        % Encapsulate comsol communication?
         % Exists tag method that calls index on model entity list or if
         % this function is not avalible .tags and searches for tag?
-        % Get domain numbers with explicit geometry selections.
-        % Get entity index array via coordinate checks.
         % Functions to createBox/Poly/Selection/Ellipse/Workplane etc.
         % Use .clear() in a workplane instead of manual delete.
-        % Domain numbers with selection.entities(2).
-        % For elm = list print(elem); end.
-        % Check if tag exists by index > 0 on any ModelEntityList.
         
         function obj = ComsolModel(varargin)
             % ComsolModel Creates a comsol model object.
@@ -323,7 +317,7 @@ classdef ComsolModel < handle % All copies are references to same object
         end
         
         
-        function modelEntity = get_or_create(~, modelEntityList, ...
+        function modelEntity = get_or_create(obj, modelEntityList, ...
                                              tag, varargin)
             % get_or_create Helper function to get/create an entity.
             %
@@ -331,11 +325,23 @@ classdef ComsolModel < handle % All copies are references to same object
             
             import com.comsol.model.*;
             
-            if modelEntityList.index(tag) >= 0 % Not in list: -1.
+            if obj.exists(modelEntityList, tag)
                 modelEntity = modelEntityList.get(tag);
             else
                 modelEntity = modelEntityList.create(tag, varargin{:});
             end
+        end
+        
+        
+        function hasFeature = exists(~, modelEntityList, tag)
+            % exists Helper to determine if tag is element of the list.
+            %
+            % hasFeature = exists(obj, modelEntityList, tag)
+            
+            import com.comsol.model.*;
+            
+            % Not in list: -1.
+            hasFeature = ~(modelEntityList.index(tag) < 0);
         end
     end
     methods(Static)
