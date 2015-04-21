@@ -1,4 +1,4 @@
-classdef Layer
+classdef Layer < handle
     % Layer Bundles a comsol workplane and an extrude feature into an unit.
     
     properties(Dependent)
@@ -46,10 +46,10 @@ classdef Layer
             p.parse(varargin{:});
             
             if isempty(p.Results.FromExtrudeTag);
-                workPlaneTag = hModel.geom.feature().uniquetag( ...
-                    obj.BASE_TAG_WORKPLANE);
-                obj.extrudeTag = hModel.geom.feature().uniquetag( ...
-                    obj.BASE_TAG_EXTRUDE);
+                workPlaneTag = char(hModel.geom.feature().uniquetag( ...
+                    obj.BASE_TAG_WORKPLANE));
+                obj.extrudeTag = char(hModel.geom.feature().uniquetag( ...
+                    obj.BASE_TAG_EXTRUDE));
                 
                 % Setup workplane.
                 workPlane = hModel.geom.feature().create(workPlaneTag, ...
@@ -60,6 +60,7 @@ classdef Layer
                 extrude = hModel.geom.feature().create(obj.extrudeTag, ...
                                                        'Extrude');
                 extrude.set('createselection', 'on');
+                extrude.selection('input').set(workPlaneTag)
                 
             else % Check extrude feature, when constructing from a tag.
                 obj.extrudeTag = p.Results.FromExtrudeTag;
@@ -75,7 +76,6 @@ classdef Layer
             
             % Use setters to assign extrude feature and workplane
             % properties.
-            obj.extrudeTag = p.Results.FromExtrudeTag;
             obj.zPosition = p.Results.zPosition;
             obj.distance = p.Results.Distance;
                 
@@ -156,7 +156,7 @@ classdef Layer
         end
         
         
-        function obj = set.name(obj, newName)
+        function set.name(obj, newName)
             
             import com.comsol.model.*;
             
@@ -176,7 +176,7 @@ classdef Layer
         end
         
         
-        function obj = set.distance(obj, newDistance)
+        function set.distance(obj, newDistance)
             
             import com.comsol.model.*;
             
@@ -195,7 +195,7 @@ classdef Layer
         end
         
         
-        function obj = set.zPosition(obj, newPosition)
+        function set.zPosition(obj, newPosition)
             
             import com.comsol.model.*;
             
