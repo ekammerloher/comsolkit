@@ -81,6 +81,7 @@ classdef LayeredModel < comsolkit.ComsolModel
                                                        varargin{2:end}, ... 
                                                        'Name', name);
                 for coordinateArray = coordinateArrayCell
+                    % For elem = cell pattern: elem 1x1 cell, use elem{1}.
                     obj.layerArray(end).add_poly(coordinateArray{1});
                 end
             end

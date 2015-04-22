@@ -314,34 +314,6 @@ classdef ComsolModel < handle % All copies are references to same object
                 obj.model.param.set(paramName, value);
             end
         end
-        
-        
-        function modelEntity = get_or_create(obj, modelEntityList, ...
-                                             tag, varargin)
-            % get_or_create Helper function to get/create an entity.
-            %
-            % get_or_create(obj, modelEntityList, tag, varargin)
-            
-            import com.comsol.model.*;
-            
-            if obj.exists(modelEntityList, tag)
-                modelEntity = modelEntityList.get(tag);
-            else
-                modelEntity = modelEntityList.create(tag, varargin{:});
-            end
-        end
-        
-        
-        function hasFeature = exists(~, modelEntityList, tag)
-            % exists Helper to determine if tag is element of the list.
-            %
-            % hasFeature = exists(obj, modelEntityList, tag)
-            
-            import com.comsol.model.*;
-            
-            % Not in list: -1.
-            hasFeature = ~(modelEntityList.index(tag) < 0);
-        end
     end
     methods(Static)
         function loadedObj = loadobj(obj)
