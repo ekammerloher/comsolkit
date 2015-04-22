@@ -68,7 +68,8 @@ classdef ComsolModel < handle % All copies are references to same object
                    
             elseif isFromFile % Load from a file on the file system.
                 if isUnitDefined || isDimensionDefined
-                    warning('LengthUnit and/or GeomDimension ignored.');
+                    warning(['LengthUnit and/or GeomDimension ' ...
+                             'ignored. Model created from file/tag.']);
                 end
                 
                 if exist(p.Results.FromFile, 'file') == 2
@@ -82,7 +83,8 @@ classdef ComsolModel < handle % All copies are references to same object
                 
             elseif isFromTag % Load from Comsol Server.
                 if isUnitDefined || isDimensionDefined
-                    warning('LengthUnit and/or GeomDimension ignored.');
+                    warning(['LengthUnit and/or GeomDimension ' ...
+                             'ignored. Model created from file/tag.']);
                 end
                 
                 modelTagCell = cell(ModelUtil.tags());

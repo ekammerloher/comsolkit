@@ -26,7 +26,7 @@ classdef LayeredModel < comsolkit.ComsolModel
                                             'GeomDimension', 3);
             
             % Prepare array for Layer objects.
-            obj.layerArray = comsolkit.Layer.empty;
+            obj.layerArray = comsolkit.Layer.empty();
         end
         
         
@@ -40,7 +40,14 @@ classdef LayeredModel < comsolkit.ComsolModel
             %                                          coordinateCell, ...
             %                                          nameCell)
             %  [startIndex, stopIndex] = batch_add_layer(obj, ...
-            %                           coordinateCell, nameCell, varargin)
+            %                                          coordinateCell, ...
+            %                                          nameCell, ...          
+            %                                          layerClass)            
+            %  [startIndex, stopIndex] = batch_add_layer(obj, ...
+            %                                          coordinateCell, ...
+            %                                          nameCell, ...          
+            %                                          layerClass, ...
+            %                                          varargin)
             %
             %  Parameter:
             %  coordinateCell: Cell array of cell arrays with n x 2 
@@ -48,6 +55,8 @@ classdef LayeredModel < comsolkit.ComsolModel
             %  nameCell: Cell array of names per layer element (optional).
             %            If not provided, names are generated using a
             %            pattern based on LAYER_NAME_BASE
+            %  layerClass: handle to constructor from which an object is
+            %              generated. (Default: '@comsolkit.Layer')
             %  varargin: Passed on to Layer object constructor. See help of
             %            comsolkit.Layer.Layer
             %
@@ -57,10 +66,17 @@ classdef LayeredModel < comsolkit.ComsolModel
             
             if nargin < 3
                 nameCell = {};
+                layerClass = @comsolkit.Layer;
+            elseif nargin < 4
+                nameCell = varargin{1};
+                layerClass = @comsolkit.Layer;
             else
                 nameCell = varargin{1};
+                layerClass = varargin{2};
             end
             
+            assert(isa(layerClass, 'function_handle'), ...
+                   'layerClass must be a function handle.');
             assert(iscell(coordinateCell) && iscell(nameCell), ...
                    'Input parameters not valid.');
             
@@ -77,9 +93,9 @@ classdef LayeredModel < comsolkit.ComsolModel
                 coordinateArrayCell = coordinateCell{i};
                 name = nameCell{i};
 
-                obj.layerArray(end+1) = comsolkit.Layer(obj, ...
-                                                       varargin{2:end}, ... 
-                                                       'Name', name);
+                obj.layerArray(end+1) = layerClass(obj, ...
+                                                   varargin{3:end}, ... 
+                                                   'Name', name);
                 for coordinateArray = coordinateArrayCell
                     % For elem = cell pattern: elem 1x1 cell, use elem{1}.
                     obj.layerArray(end).add_poly(coordinateArray{1});
@@ -94,13 +110,18 @@ classdef LayeredModel < comsolkit.ComsolModel
             %
             %  index = add_layer(obj, coordinateArrayCell)
             %  index = add_layer(obj, coordinateArrayCell, name)
-            %  index = add_layer(obj, coordinateArrayCell, name, varargin)
+            %  index = add_layer(obj, coordinateArrayCell, name, ...
+            %                    layerClass)
+            %  index = add_layer(obj, coordinateArrayCell, name, ...
+            %                    layerClass, varargin)
             %
             %  Parameter:
             %  coordinateArrayCell: Cell array with n x 2 
-            %                  coorinate arrays: {[...], ...}
+            %                       coorinate arrays: {[...], ...}
             %  name: Name of layer element (optional). If not provided,
             %        a name is generated from LAYER_NAME_BASE
+            %  layerClass: handle to constructor from which an object is
+            %              generated. (Default: '@comsolkit.Layer')
             %  varargin: Passed on to Layer object constructor. See help of
             %            comsolkit.Layer.Layer
             %
@@ -111,9 +132,15 @@ classdef LayeredModel < comsolkit.ComsolModel
                 index = obj.batch_add_layer({coordinateArrayCell});
             else
                 name = varargin{1};
-                index = obj.batch_add_layer({coordinateArrayCell}, ...
-                                            {name}, ...
-                                            varargin{2:end});
+                if isempty(name)
+                    index = obj.batch_add_layer({coordinateArrayCell}, ...
+                                                {}, ...
+                                                varargin{2:end});
+                else
+                    index = obj.batch_add_layer({coordinateArrayCell}, ...
+                                                {name}, ...
+                                                varargin{2:end});
+                end
             end
         end
         

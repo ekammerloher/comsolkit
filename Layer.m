@@ -1,4 +1,4 @@
-classdef Layer < handle
+classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
     % Layer Bundles a comsol workplane and an extrude feature into an unit.
     
     properties(Dependent)
@@ -157,7 +157,7 @@ classdef Layer < handle
         end
         
         
-        function set.name(obj, newName)
+        function obj =  set.name(obj, newName)
             
             import com.comsol.model.*;
             
@@ -177,7 +177,7 @@ classdef Layer < handle
         end
         
         
-        function set.distance(obj, newDistance)
+        function obj =  set.distance(obj, newDistance)
             
             import com.comsol.model.*;
             
@@ -196,7 +196,7 @@ classdef Layer < handle
         end
         
         
-        function set.zPosition(obj, newPosition)
+        function obj = set.zPosition(obj, newPosition)
             
             import com.comsol.model.*;
             
@@ -225,6 +225,8 @@ classdef Layer < handle
             %
             %  polyTag = add_poly(obj, coordinateArray)
             
+            import com.comsol.model.*;
+            
             assert(isnumeric(coordinateArray) && ...
                    size(coordinateArray, 2) == 2 && ...
                    ~isempty(coordinateArray), ...
@@ -244,6 +246,8 @@ classdef Layer < handle
             %
             %  clear_workplane(obj)
             
+            import com.comsol.model.*;
+            
             obj.workPlane.geom.feature().clear();
         end
         
@@ -252,8 +256,18 @@ classdef Layer < handle
             % print Prints information string about the object.
             %
             %  print(obj)
+
+            fprintf('%s(%s), zPosition: %f\n', obj.name, ...
+                        class(obj), obj.zPosition);
+        end
+    end
+    methods(Sealed)
+        function plot(obj)
             
-            objArray = [ obj ]; % Collect objs on vectorised function call.
+            % Collect objs on vectorised function call. This function works
+            % vectorized and has therefore to be sealed in a polymorphic
+            % scenario.
+            objArray = [ obj ];
             
             for layer = objArray
                 fprintf('%s(%s), zPosition: %f\n', layer.name, ...
