@@ -316,6 +316,17 @@ classdef ComsolModel < handle % All copies are references to same object
                 obj.model.param.set(paramName, value);
             end
         end
+        
+        
+        function plot(obj, varargin)
+            % plot Wrapper for mphgeom. See help mphgeom for parameters.
+            %
+            %  plot(obj)
+            %  plot(obj, varargin)
+            
+            mphgeom(obj.model, obj.geom.tag(), 'facealpha', 0.5);
+        end
+            
     end
     methods(Static)
         function loadedObj = loadobj(obj)
