@@ -180,7 +180,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 unitPair = obj.UNIT(logicIndex);
                 unitPair = unitPair{1}; % Is 1x1 cell of 1x2 cell.
                 
-                fprintf('Length unit set to %s.\n', unitPair{1});
+                % fprintf('Length unit set to %s.\n', unitPair{1});
                 obj.geom.lengthUnit(unitPair{1});
             else
                 warning(['Length %e m as a unit is not recognized. ' ...

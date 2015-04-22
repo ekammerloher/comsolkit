@@ -49,7 +49,7 @@ classdef Layer < handle
             
             p.parse(varargin{:});
             
-            if isempty(p.Results.FromExtrudeTag);
+            if isempty(p.Results.FromExtrudeTag)
                 workPlaneTag = char(hModel.geom.feature().uniquetag( ...
                     obj.BASE_TAG_WORKPLANE));
                 obj.extrudeTag = char(hModel.geom.feature().uniquetag( ...
@@ -64,7 +64,7 @@ classdef Layer < handle
                 extrude = hModel.geom.feature().create(obj.extrudeTag, ...
                                                        'Extrude');
                 extrude.set('createselection', 'on');
-                extrude.selection('input').set(workPlaneTag)
+                extrude.selection('input').set(workPlaneTag);
                 
             else % Check extrude feature, when constructing from a tag.
                 obj.extrudeTag = p.Results.FromExtrudeTag;
