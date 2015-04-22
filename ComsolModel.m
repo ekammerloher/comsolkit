@@ -27,11 +27,6 @@ classdef ComsolModel < handle % All copies are references to same object
     end
     
     methods
-        % Exists tag method that calls index on model entity list or if
-        % this function is not avalible .tags and searches for tag?
-        % Functions to createBox/Poly/Selection/Ellipse/Workplane etc.
-        % Use .clear() in a workplane instead of manual delete.
-        
         function obj = ComsolModel(varargin)
             % ComsolModel Creates a comsol model object.
             %
@@ -206,10 +201,10 @@ classdef ComsolModel < handle % All copies are references to same object
             % logical array.
             logicIndex = cellfun(@(x) isequal(x{1}, unitString), obj.UNIT);
             
-            if sum(logicIndex) ~= 1 % Only one match should be possible.
-                error(['Unit %s is not well defined. Update UNITS with' ...
-                       ' the right string/value pair.'], unitString);
-            end
+            % Only one match should be possible.
+            assert(sum(logicIndex) == 1, ...
+                   ['Unit %s is not well defined. Update UNITS with' ...
+                    ' the right string/value pair.'], unitString);
 
             unitPair = obj.UNIT(logicIndex);
             unitPair = unitPair{1}; % Is 1x1 cell of 1x2 cell.
@@ -219,6 +214,8 @@ classdef ComsolModel < handle % All copies are references to same object
         
         function delete(obj)
             % delete Removes the object (also from the server).
+            %
+            %  delete(obj)
             
             import com.comsol.model.util.*;
             
@@ -246,6 +243,8 @@ classdef ComsolModel < handle % All copies are references to same object
         
         function savedObj = saveobj(obj)
             % saveobj Saves the object including the comsol model.
+            %
+            %  savedObj = saveobj(obj)
             
             import com.comsol.model.*;
             
@@ -347,6 +346,8 @@ classdef ComsolModel < handle % All copies are references to same object
     methods(Static)
         function loadedObj = loadobj(obj)
             % loadobj Loads the object including the comsol model.
+            %
+            %  loadedObj = loadobj(obj)
             
             import com.comsol.model.*;
             import com.comsol.model.util.*;

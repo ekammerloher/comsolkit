@@ -12,6 +12,7 @@ classdef Layer < handle
     properties(Constant)
         BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
         BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext string for uniquetag.
+        BASE_TAG_POLY = 'dyn_poly'; % Base poly string for uniquetag.
         WORKPLANE_NAME_PREFIX = 'wp_'; % Prefix of workplane label.
     end
     properties(Access=private)
@@ -71,10 +72,9 @@ classdef Layer < handle
                 % Use getter of extrude.
                 extrudeFrom = char(obj.extrude.getString('extrudefrom'));
 
-                if ~strcmp(extrudeFrom, 'workplane')
-                    error(['Extrude feature must extrude from a ' ...
-                           'workplane and not a face.']);
-                end 
+                assert(strcmp(extrudeFrom, 'workplane'), ...
+                              ['Extrude feature must extrude from a ' ...
+                               'workplane and not a face.']);
             end
             
             % Use setters to assign extrude feature and workplane
@@ -95,10 +95,10 @@ classdef Layer < handle
             
             extrudeIndex = obj.hModel.geom.feature().index(obj.extrudeTag);
             
-            if extrudeIndex < 0 % Is -1 when not in list.
-                error('Could not find extrude feature %s.', ...
-                      obj.extrudeTag);
-            end
+            % Is -1 when not in list.
+            assert(extrudeIndex >= 0, ...
+                   'Could not find extrude feature %s.', ...
+                   obj.extrudeTag);
             
             extrude = obj.hModel.geom.feature(obj.extrudeTag);
         end
@@ -113,17 +113,15 @@ classdef Layer < handle
             inputObjectCell = cell( ...
                 obj.extrude.selection('input').objects());
             
-            if length(inputObjectCell) ~= 1
-                error(['Layer expects one workplane for the extrude ' ...
-                       'feature. Found %d.'], length(inputObjectCell));
-            end
-            
+            assert(length(inputObjectCell) == 1, ...
+                   ['Layer expects one workplane for the extrude ' ...
+                    'feature. Found %d.'], length(inputObjectCell));
+                            
             workplaneIndex = ...
                 obj.hModel.geom.feature().index(inputObjectCell{1});
             
-            if workplaneIndex < 0
-                error('Could not find workplane %s.', inputObjectCell{1});
-            end
+            assert(workplaneIndex >= 0, 'Could not find workplane %s.', ...
+                   inputObjectCell{1});
             
             workPlane = obj.hModel.geom.feature( inputObjectCell{1});
         end
@@ -211,12 +209,42 @@ classdef Layer < handle
         
         function delete(obj)
             % delete Removes the workplane/extrude-feature from the model.
+            %
+            %  delete(obj)
             
             import com.comsol.model.*;
             
             workplaneTag = obj.workPlane.tag();
             obj.hModel.geom.feature().remove(obj.extrudeTag);
             obj.hModel.geom.feature().remove(workplaneTag);
+        end
+        
+        
+        function polyTag = add_poly(obj, coordinateArray)
+            % add_poly Adds a polygon defined by an n x 2 array.
+            %
+            %  polyTag = add_poly(obj, coordinateArray)
+            
+            assert(isnumeric(coordinateArray) && ...
+                   size(coordinateArray, 2) == 2 && ...
+                   ~isempty(coordinateArray), ...
+                   'Coordinates are not valid.');
+               
+            
+            polyTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                obj.BASE_TAG_POLY));
+            poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
+            poly.set('source', 'table');
+            poly.set('table', coordinateArray);
+        end
+        
+        
+        function clear_features(obj)
+            % clear_features Clears the workplan geometry feature list.
+            %
+            %  clear_features(obj)
+            
+            obj.workPlane.geom.feature().clear();
         end
     end
 end
