@@ -18,7 +18,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         WORKPLANE_NAME_PREFIX = 'wp_'; % Prefix of workplane label.
     end
     properties(Access=private)
-        extrudeTag % Access extrude distance in extrude feature.
+        extrudeTag % Tag to the extrude feature of the layer.
         hModel % Handle to a ComsolModel object or a derived object.
     end
     

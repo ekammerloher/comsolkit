@@ -16,7 +16,6 @@ classdef LayeredModel < comsolkit.ComsolModel
             %  FromTag: Load from an existing model on the server by tag
             %  %%% parameters below only for new models %%%
             %  LengthUnit: Length of a unit in meters (default: 1e-9)
-            %  GeomDimension: Dimensions of the model (default: 3)
             
             % Call super constructor with explicit 3d geometry.
             obj = obj@comsolkit.ComsolModel(varargin{:}, ...
