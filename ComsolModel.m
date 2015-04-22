@@ -5,7 +5,7 @@ classdef ComsolModel < handle % All copies are references to same object
     % Based on: http://de.mathworks.com/help/matlab/matlab_oop/ ...
     % avoiding-property-initialization-order-dependency.html
     properties(Dependent)
-        lengthUnit % Base length of a unit in meters.
+        lengthUnit % Length of a unit in meters.
         tag % Tag of the model object.
         geom % Maintain a handle to the first geometry object
     end
