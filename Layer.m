@@ -1,3 +1,5 @@
+% Based on: http://de.mathworks.com/help/matlab/ref/ ...
+% matlab.mixin.heterogeneous-class.html
 classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
     % Layer Bundles a comsol workplane and an extrude feature into an unit.
     
@@ -257,22 +259,66 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %
             %  print(obj)
 
-            fprintf('%s(%s), zPosition: %f\n', obj.name, ...
+            fprintf('''%s'' (%s), zPosition: %f\n', obj.name, ...
                         class(obj), obj.zPosition);
         end
     end
     methods(Sealed)
-        function plot(obj)
+        function plot(obj, varargin)
+            % plot Plots workplane features.
+            %
+            %  plot(obj, varargin)
+            %
+            %  Parameters:
+            %  varargin: Passed on to the basic plot function
             
             % Collect objs on vectorised function call. This function works
             % vectorized and has therefore to be sealed in a polymorphic
             % scenario.
+            
+            import com.comsol.model.*;
+            
             objArray = [ obj ];
             
+            p = inputParser;
+            p.KeepUnmatched = true;
+            addParameter(p, 'Names', 'off', @ischar);
+            parse(p,varargin{:});
+            
+            hold on; % Will draw into open figure with this.
+            axis equal; % Maintain proportions of geometry.
+            
             for layer = objArray
-                fprintf('%s(%s), zPosition: %f\n', layer.name, ...
-                        class(layer), layer.zPosition);
+                % Use java iterator, since GeomFeatureList has a
+                % java.lang.Iterable interface.
+                itr = layer.workPlane.geom.feature().iterator;
+                
+                while itr.hasNext()
+                    feature = itr.next();
+                    featureType = char(feature.getType());
+                    
+                    %disp(featureType);
+                    switch featureType
+                        case 'Polygon'
+                            coordinates = feature.getDoubleMatrix('table');
+                            
+                            plot(coordinates(:,1), coordinates(:,2), ...
+                                 'red', p.Unmatched);
+                             
+                            if strcmp(p.Results.Names, 'on')
+                                meanCoord = mean(coordinates, 1);
+                                text(meanCoord(1), meanCoord(2), ...
+                                     layer.name, 'Interpreter', 'none');
+                            end
+                        otherwise
+                            warning(['Skipping feature %. Type %s not ' ...
+                                   ' not implemented. Update plot().'], ...
+                                   char(feature.tag()), featureType);
+                    end
+                end
             end
+            
+            hold off;
         end
     end
 end

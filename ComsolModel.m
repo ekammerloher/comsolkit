@@ -2,7 +2,7 @@ classdef ComsolModel < handle % All copies are references to same object
     % COMSOLMODEL Manages the comsol object on a comsol server
     
     % Dependent variables are created from model on demand. Not saved.
-    % based on: http://de.mathworks.com/help/matlab/matlab_oop/ ...
+    % Based on: http://de.mathworks.com/help/matlab/matlab_oop/ ...
     % avoiding-property-initialization-order-dependency.html
     properties(Dependent)
         lengthUnit % Base length of a unit in meters.
