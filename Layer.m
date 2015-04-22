@@ -239,12 +239,26 @@ classdef Layer < handle
         end
         
         
-        function clear_features(obj)
-            % clear_features Clears the workplan geometry feature list.
+        function clear_workplane(obj)
+            % clear_workplane Clears the workplan geometry feature list.
             %
-            %  clear_features(obj)
+            %  clear_workplane(obj)
             
             obj.workPlane.geom.feature().clear();
+        end
+        
+        
+        function print(obj)
+            % print Prints information string about the object.
+            %
+            %  print(obj)
+            
+            objArray = [ obj ]; % Collect objs on vectorised function call.
+            
+            for layer = objArray
+                fprintf('%s(%s), zPosition: %f\n', layer.name, ...
+                        class(layer), layer.zPosition);
+            end
         end
     end
 end
