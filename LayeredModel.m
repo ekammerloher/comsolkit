@@ -183,9 +183,23 @@ classdef LayeredModel < comsolkit.ComsolModel
         function savedObj = saveobj(obj)
             % saveobj Saves the object including the comsol model.
             %
-            % savedObj = saveobj(obj)
+            %  savedObj = saveobj(obj)
             
             savedObj = saveobj@comsolkit.ComsolModel(obj);
+        end
+        
+        
+        function print_layer_info(obj)
+            % print_layer_info Prints layer information in a table.
+            %
+            %  print_layer_info(obj)
+            
+            fprintf('%-30s %-30s %s\n','Class', 'Name', ...
+                    'zPosition');
+            fprintf([repmat('-', 1, 80), '\n']);
+            for layer = obj.layerArray
+                layer.print();
+            end
         end
     end
     methods(Static)

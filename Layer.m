@@ -259,8 +259,8 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %
             %  print(obj)
 
-            fprintf('''%s'' (%s), zPosition: %f\n', obj.name, ...
-                        class(obj), obj.zPosition);
+            fprintf('%-30s %-30s %f\n', class(obj), ...
+                        obj.name, obj.zPosition);
         end
     end
     methods(Sealed)
@@ -311,8 +311,8 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                                      layer.name, 'Interpreter', 'none');
                             end
                         otherwise
-                            warning(['Skipping feature %. Type %s not ' ...
-                                   ' not implemented. Update plot().'], ...
+                            warning(['Skipping feature %s. Type %s not ' ...
+                                   'implemented. Update plot().'], ...
                                    char(feature.tag()), featureType);
                     end
                 end
