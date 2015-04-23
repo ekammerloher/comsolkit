@@ -73,7 +73,7 @@ classdef Gate < comsolkit.Layer
             
             import com.comsol.model.*;
             
-            voltage = obj.potential.getDouble('V0');
+            voltage = str2double(obj.potential.getString('V0'));
         end
         
         

@@ -90,6 +90,8 @@ classdef LayeredModel < comsolkit.ComsolModel
             % Loop over input cell of coordinate arrays.
             for i = 1:length(coordinateCell)
                 coordinateArrayCell = coordinateCell{i};
+                assert(iscell(coordinateArrayCell), ...
+                       'Wrong format of input coordinates.');
                 name = nameCell{i};
 
                 if isempty(name)
