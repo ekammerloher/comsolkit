@@ -237,10 +237,11 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             itr = obj.workPlane.geom.feature().iterator;
             indexCell = 1;
+            nPolygons = 0;
             
             % While there are polygon features, update their table. Ensure,
             % that newCell has eneugh coordinateArrays.
-            while itr.hasNext() && length(newCell) > indexCell
+            while itr.hasNext() && indexCell <= length(newCell)
                 feature = itr.next();
                 featureType = char(feature.getType());
 
@@ -250,15 +251,17 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                     assert(isnumeric(coordinateArray) && ...
                            size(coordinateArray, 2) == 2 && ...
                            ~isempty(coordinateArray), ...
-                           'Coordinates are not valid.');
+                           'Coordinates at index %d are not valid.', ...
+                            indexCell);
                        
                     feature.set('table', coordinateArray);
                     indexCell = indexCell + 1;
+                    nPolygons = nPolygons + 1;
                 end
             end
             
             % While newCell contains additional polygons, add them.
-            while length(newCell) > indexCell
+            while nPolygons < length(newCell)
                 coordinateArray = newCell{indexCell};
                     
                 assert(isnumeric(coordinateArray) && ...
@@ -269,15 +272,29 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                        
                 obj.add_poly(coordinateArray);
                 indexCell = indexCell + 1;
+                nPolygons = nPolygons + 1;
             end
             
             % While there are too many polygon features, delete them.
+            % First skip polygons defined in newCell.
+            itr = obj.workPlane.geom.feature().iterator;
+            indexCell = 1;
+            while itr.hasNext() && indexCell <= length(newCell)
+                feature = itr.next();
+                featureType = char(feature.getType());
+
+                if strcmp(featureType, 'Polygon')
+                    indexCell = indexCell + 1;
+                end
+            end
+            % Delete the rest.
             while itr.hasNext()
                 feature = itr.next();
                 featureType = char(feature.getType());
 
                 if strcmp(featureType, 'Polygon')
-                    feature.remove();
+                    % Remove feature from feature list by tag.
+                    obj.workPlane.geom.feature().remove(feature.tag());
                 end
             end
         end
