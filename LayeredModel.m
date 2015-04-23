@@ -4,6 +4,9 @@ classdef LayeredModel < comsolkit.ComsolModel
     properties
         layerArray % Contains Layer object handles.
     end
+    properties(Constant)
+        DEFAULT_LAYER_CLASS = @comsolkit.Layer; % Used for add functions.
+    end
     
     methods
         function obj = LayeredModel(varargin)
@@ -61,10 +64,10 @@ classdef LayeredModel < comsolkit.ComsolModel
             
             if nargin < 3
                 nameCell = {};
-                layerClass = @comsolkit.Layer;
+                layerClass = obj.DEFAULT_LAYER_CLASS;
             elseif nargin < 4
                 nameCell = varargin{1};
-                layerClass = @comsolkit.Layer;
+                layerClass = obj.DEFAULT_LAYER_CLASS;
             else
                 nameCell = varargin{1};
                 layerClass = varargin{2};
