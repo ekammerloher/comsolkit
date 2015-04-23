@@ -136,16 +136,16 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             selectionCell = cell(obj.extrude.outputSelection());
             
-            % Assume we are interested in domains. Their selection name is
-            % the last element.
-            domainTag = selectionCell{end};
+            % Assume we are interested in boundaries. Their selection name
+            % is the last element - 1.
+            boundaryTag = selectionCell{end-1};
             
             % Not so nice way to access selection from model.selection.
             % Since geometry selections seperate levels with dots.
-            domainTag = strrep(domainTag, '.', '_');
+            boundaryTag = strrep(boundaryTag, '.', '_');
             
             % <gtag>_<trimmedseltag>_<lvl>
-            selectionTag = [char(obj.hModel.geom.tag()) '_' domainTag];
+            selectionTag = [char(obj.hModel.geom.tag()) '_' boundaryTag];
         end
     
         
