@@ -86,6 +86,16 @@ classdef Gate < comsolkit.Layer
                
             obj.potential.set('V0', newVoltage);
         end
+        
+        
+        function str = info_string(obj)
+            % info_string Generates information string about the object.
+            %
+            %  str = info_string(obj)
+            
+            str = info_string@comsolkit.Layer(obj);
+            str = sprintf('%s, voltage: %f', str, obj.voltage);
+        end
     end
     methods(Static)
         function clear_es_features(hModel)
