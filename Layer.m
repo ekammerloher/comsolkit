@@ -445,4 +445,39 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             hold off;
         end
     end
+    methods(Static)
+        function clear_geometry_features(hModel)
+            % clear_geometry_features Removes by tag pattern BASE_TAG*.
+            %
+            %  clear_geometry_features(hModel)
+            %
+            %  Parameters:
+            %  hModel: ComsolModel object or a derived object.
+            
+            import com.comsol.model.*;
+            
+            itr = hModel.geom.feature().iterator;
+            removeCell = {};
+            while itr.hasNext()
+                feature = itr.next();
+                featureTag = char(feature.tag());
+                
+                isExtrude = strncmp(featureTag, ...
+                              comsolkit.Layer.BASE_TAG_EXTRUDE, ...
+                              length(comsolkit.Layer.BASE_TAG_EXTRUDE));
+                isWorkplane = strncmp(featureTag, ...
+                              comsolkit.Layer.BASE_TAG_WORKPLANE, ...
+                              length(comsolkit.Layer.BASE_TAG_WORKPLANE));
+
+                if isExtrude || isWorkplane
+                    %hModel.geom.feature().remove(featureTag);
+                    removeCell{end+1} = featureTag;
+                end
+            end
+            % Does not work from inside the iterator. Concurrency error.
+            for featureTag = removeCell
+                hModel.geom.feature().remove(featureTag{1});
+            end
+        end
+    end
 end

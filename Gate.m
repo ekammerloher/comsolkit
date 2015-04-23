@@ -87,4 +87,35 @@ classdef Gate < comsolkit.Layer
             obj.potential.set('V0', newVoltage);
         end
     end
+    methods(Static)
+        function clear_es_features(hModel)
+            % clear_es_features Removes by tag pattern BASE_TAG*.
+            %
+            %  clear_es_features(hModel)
+            %
+            %  Parameters:
+            %  hModel: ComsolModel object or a derived object.
+            
+            import com.comsol.model.*;
+            
+            itr = hModel.es.feature().iterator;
+            removeCell = {};
+            while itr.hasNext()
+                feature = itr.next();
+                featureTag = char(feature.tag());
+                
+                isPotential = strncmp(featureTag, ...
+                              comsolkit.Gate.BASE_TAG_POTENTIAL, ...
+                              length(comsolkit.Gate.BASE_TAG_POTENTIAL));
+               
+                if isPotential
+                    removeCell{end+1} = featureTag;
+                end
+            end
+            % Does not work from inside the iterator. Concurrency error.
+            for featureTag = removeCell
+                hModel.es.feature().remove(featureTag{1});
+            end
+        end    
+    end    
 end
