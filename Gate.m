@@ -3,7 +3,6 @@ classdef Gate < comsolkit.Layer
     
     properties(Dependent)
         voltage % Voltage applied to the gate.
-        polygonCell % Cell containing nx2 arrays, that define polygons.
     end
     properties(Constant)
         BASE_TAG_POTENTIAL = 'layer_pot'; % Base potential string.

@@ -10,6 +10,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         workPlane % Handle to the workplane feature of Layer.
         extrude % Handle to the extrude feature of Layer.
         selectionTag % Tag of the extrude domain selection feature.
+        polygonCell % Cell containing nx2 arrays of polygons (if any).
     end
     properties(Constant)
         BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
@@ -209,6 +210,79 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         end
         
         
+        function polygonCell = get.polygonCell(obj)
+            
+            import com.comsol.model.*;
+            
+            itr = obj.workPlane.geom.feature().iterator;
+            polygonCell = {};
+
+            while itr.hasNext()
+                feature = itr.next();
+                featureType = char(feature.getType());
+
+                if strcmp(featureType, 'Polygon')
+                    coordinates = feature.getDoubleMatrix('table');
+                    polygonCell{end+1} = coordinates;
+                end
+            end
+        end
+        
+        
+        function obj = set.polygonCell(obj, newCell)
+            
+            import com.comsol.model.*;
+            
+            assert(iscell(newCell), 'Input must be a cell.');
+            
+            itr = obj.workPlane.geom.feature().iterator;
+            indexCell = 1;
+            
+            % While there are polygon features, update their table. Ensure,
+            % that newCell has eneugh coordinateArrays.
+            while itr.hasNext() && length(newCell) > indexCell
+                feature = itr.next();
+                featureType = char(feature.getType());
+
+                if strcmp(featureType, 'Polygon')
+                    coordinateArray = newCell{indexCell};
+                    
+                    assert(isnumeric(coordinateArray) && ...
+                           size(coordinateArray, 2) == 2 && ...
+                           ~isempty(coordinateArray), ...
+                           'Coordinates are not valid.');
+                       
+                    feature.set('table', coordinateArray);
+                    indexCell = indexCell + 1;
+                end
+            end
+            
+            % While newCell contains additional polygons, add them.
+            while length(newCell) > indexCell
+                coordinateArray = newCell{indexCell};
+                    
+                assert(isnumeric(coordinateArray) && ...
+                       size(coordinateArray, 2) == 2 && ...
+                       ~isempty(coordinateArray), ...
+                       'Coordinates at index %d are not valid.', ...
+                       indexCell);
+                       
+                obj.add_poly(coordinateArray);
+                indexCell = indexCell + 1;
+            end
+            
+            % While there are too many polygon features, delete them.
+            while itr.hasNext()
+                feature = itr.next();
+                featureType = char(feature.getType());
+
+                if strcmp(featureType, 'Polygon')
+                    feature.remove();
+                end
+            end
+        end
+        
+        
         function delete(obj)
             % delete Removes the workplane/extrude-feature from the model.
             %
@@ -254,13 +328,17 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         end
         
         
-        function print(obj)
-            % print Prints information string about the object.
+        function str = info_string(obj)
+            % info_string Generates information string about the object.
             %
-            %  print(obj)
+            %  str = info_string(obj)
+            
+            maxDistance = max([obj.distance(:) 0]);
+            minDistance = min([obj.distance(:) 0]);
 
-            fprintf('%-30s %-30s %f\n', class(obj), ...
-                        obj.name, obj.zPosition);
+            str = sprintf('%-30s %-30s %-15f %-15f', class(obj), ...
+                          obj.name, obj.zPosition, ...
+                          maxDistance - minDistance);
         end
     end
     methods(Sealed)
@@ -270,7 +348,11 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %  plot(obj, varargin)
             %
             %  Parameters:
-            %  varargin: Passed on to the basic plot function
+            %  Names: Print layer names in the plot (default: 'off')
+            %  View: Use matlab plot function '2D' or mphviewselection
+            %        '3D' (default: '2D')
+            %  varargin: Passed on to the plot function. See help plot for
+            %            '2D' and help mphviewselection for '3D'
             
             % Collect objs on vectorised function call. This function works
             % vectorized and has therefore to be sealed in a polymorphic
@@ -283,38 +365,63 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             p = inputParser;
             p.KeepUnmatched = true;
             addParameter(p, 'Names', 'off', @ischar);
+            addParameter(p, 'View', '2D', @ischar);
             parse(p,varargin{:});
             
             hold on; % Will draw into open figure with this.
             axis equal; % Maintain proportions of geometry.
             
             for layer = objArray
-                % Use java iterator, since GeomFeatureList has a
-                % java.lang.Iterable interface.
-                itr = layer.workPlane.geom.feature().iterator;
                 
-                while itr.hasNext()
-                    feature = itr.next();
-                    featureType = char(feature.getType());
-                    
-                    %disp(featureType);
-                    switch featureType
-                        case 'Polygon'
-                            coordinates = feature.getDoubleMatrix('table');
-                            
-                            plot(coordinates(:,1), coordinates(:,2), ...
-                                 'red', p.Unmatched);
-                             
-                            if strcmp(p.Results.Names, 'on')
-                                meanCoord = mean(coordinates, 1);
-                                text(meanCoord(1), meanCoord(2), ...
-                                     layer.name, 'Interpreter', 'none');
+                switch p.Results.View
+                    case '2D'
+                        % Use java iterator, since GeomFeatureList has a
+                        % java.lang.Iterable interface.
+                        itr = layer.workPlane.geom.feature().iterator;
+
+                        while itr.hasNext()
+                            feature = itr.next();
+                            featureType = char(feature.getType());
+
+                            %disp(featureType);
+                            switch featureType
+                                case 'Polygon'
+                                    coordinates = ...
+                                        feature.getDoubleMatrix('table');
+
+                                    plot(coordinates(:,1), ...
+                                         coordinates(:,2), ...
+                                         'red', p.Unmatched);
+
+                                    if strcmp(p.Results.Names, 'on')
+                                        meanCoord = mean(coordinates, 1);
+                                        text(meanCoord(1), ...
+                                             meanCoord(2), ...
+                                             layer.name, ...
+                                             'Interpreter', 'none');
+                                    end
+                                otherwise
+                                    warning(['Skipping feature %s. ' ...
+                                             'Type %s not implemented. '
+                                             'Update plot().'], ...
+                                             char(feature.tag()), ...
+                                             featureType);
                             end
-                        otherwise
-                            warning(['Skipping feature %s. Type %s not ' ...
-                                   'implemented. Update plot().'], ...
-                                   char(feature.tag()), featureType);
-                    end
+                        end
+                    case '3D'
+                        % mphviewselection does not accept a struct with
+                        % Parameter/value pairs. It has to be a cell.
+                        fNames = fieldnames(p.Unmatched);
+                        sValues = struct2cell(p.Unmatched);
+                        v = {fNames{:}; sValues{:}}; % 2 x n cell.
+                        v = {v{:}}; % Exploit linear indexing.
+                        
+                        mphviewselection(obj.hModel.model, ...
+                                         obj.selectionTag, ...
+                                         'facealpha', 0.5, v{:});
+                    otherwise
+                        warning('View value %s not implemented', ...
+                                p.Results.View);
                 end
             end
             

@@ -159,9 +159,7 @@ classdef ComsolModel < handle % All copies are references to same object
                 obj.model.isActive();
             catch
                 % TODO: inputname(1) fails to get object name.
-                error(['Exception accessing the model object. Call ' ...
-                       '%s.model to see the full java stacktrace.'], ...
-                       inputname(1));
+                error('Exception accessing the model object.');
             end
             model = obj.model;
         end
