@@ -98,6 +98,9 @@ classdef Gate < comsolkit.Layer
             
             import com.comsol.model.*;
             
+            assert(isa(hModel, 'comsolkit.GateLayoutModel'), ...
+                   'hModel has to be of class comsolkit.GateLayoutModel');
+            
             itr = hModel.es.feature().iterator;
             removeCell = {};
             while itr.hasNext()
