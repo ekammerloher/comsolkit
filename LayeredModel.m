@@ -198,11 +198,13 @@ classdef LayeredModel < comsolkit.ComsolModel
             %
             %  print_layer_info(obj)
             
-            fprintf('%-30s %-30s %-15s %-15s\n','Class', 'Name', ...
+            fprintf('    %-30s %-30s %-15s %-15s\n','Class', 'Name', ...
                     'zPosition', 'totDistance');
-            fprintf([repmat('-', 1, 90), '\n']);
-            for layer = obj.layerArray
-                fprintf('%s\n', layer.info_string());
+            fprintf([repmat('-', 1, 93), '\n']);
+            for index = 1:length(obj.layerArray)
+                layer = obj.layerArray(index);
+                
+                fprintf('%-3d %s\n', index, layer.info_string());
             end
         end
     end

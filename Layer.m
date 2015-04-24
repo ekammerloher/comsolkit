@@ -9,7 +9,8 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         zPosition % z-Position of the layer in the model.
         workPlane % Handle to the workplane feature of Layer.
         extrude % Handle to the extrude feature of Layer.
-        selectionTag % Tag of the extrude domain selection feature.
+        boundaryTag % Tag of the extrude boundary selection.
+        domainTag % Tag of the extrude boundary selection.
         polygonCell % Cell containing nx2 arrays of polygons (if any).
     end
     properties(Constant)
@@ -130,7 +131,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         end
         
         
-        function selectionTag = get.selectionTag(obj)
+        function boundaryTag = get.boundaryTag(obj)
             
             import com.comsol.model.*;
             
@@ -145,7 +146,26 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             boundaryTag = strrep(boundaryTag, '.', '_');
             
             % <gtag>_<trimmedseltag>_<lvl>
-            selectionTag = [char(obj.hModel.geom.tag()) '_' boundaryTag];
+            boundaryTag = [char(obj.hModel.geom.tag()) '_' boundaryTag];
+        end
+        
+        
+        function domainTag = get.domainTag(obj)
+            
+            import com.comsol.model.*;
+            
+            selectionCell = cell(obj.extrude.outputSelection());
+            
+            % Assume we are interested in domains. Their selection name
+            % is the last element.
+            domainTag = selectionCell{end};
+            
+            % Not so nice way to access selection from model.selection.
+            % Since geometry selections seperate levels with dots.
+            domainTag = strrep(domainTag, '.', '_');
+            
+            % <gtag>_<trimmedseltag>_<lvl>
+            domainTag = [char(obj.hModel.geom.tag()) '_' domainTag];
         end
     
         
@@ -434,7 +454,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                         v = {v{:}}; % Exploit linear indexing.
                         
                         mphviewselection(obj.hModel.model, ...
-                                         obj.selectionTag, ...
+                                         obj.domainTag, ...
                                          'facealpha', 0.5, v{:});
                     otherwise
                         warning('View value %s not implemented', ...

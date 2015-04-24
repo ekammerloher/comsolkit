@@ -48,7 +48,7 @@ classdef Gate < comsolkit.Layer
                 potential = obj.hModel.es.feature.create( ...
                                 obj.potentialTag, 'ElectricPotential', 2);
                             
-                potential.selection.named(obj.selectionTag);
+                potential.selection.named(obj.boundaryTag);
                 potential.label(obj.name);
             end
             
@@ -88,13 +88,23 @@ classdef Gate < comsolkit.Layer
         end
         
         
+        function delete(obj)
+            % delete Removes the workplane/extrude/potential from the model.
+            %
+            %  delete(obj)
+            
+            delete@comsolkit.Layer(obj);
+            obj.hModel.es.feature().remove(obj.potentialTag);
+        end
+        
+        
         function str = info_string(obj)
             % info_string Generates information string about the object.
             %
             %  str = info_string(obj)
             
             str = info_string@comsolkit.Layer(obj);
-            str = sprintf('%s, voltage: %f', str, obj.voltage);
+            str = sprintf('%s voltage: %f', str, obj.voltage);
         end
     end
     methods(Static)
