@@ -393,7 +393,7 @@ classdef ComsolModel < handle % All copies are references to same object
             %  server_connect(ipAdress, port)
             %  server_connect(ipAdress, port, user, passWord)
             
-            
+            import com.comsol.model.*;
             import com.comsol.model.util.*;
             
             switch nargin
