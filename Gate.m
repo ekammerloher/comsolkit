@@ -34,7 +34,7 @@ classdef Gate < comsolkit.Layer
             p.KeepUnmatched = true;
             addParameter(p, 'FromPotentialTag', '', @ischar);
             addParameter(p, 'Voltage', 0, ...
-                         @(x) isnumeric(x) && length(x) == 1);
+                         @(x) isnumeric(x) && isscalar(x));
             parse(p,varargin{:});
             
             obj = obj@comsolkit.Layer(hModel, p.Unmatched);
@@ -81,7 +81,7 @@ classdef Gate < comsolkit.Layer
             
             import com.comsol.model.*;
             
-            assert(isnumeric(newVoltage) && length(newVoltage) == 1, ...
+            assert(isnumeric(newVoltage) && isscalar(newVoltage), ...
                    'New voltage is not valid.');
                
             obj.potential.set('V0', newVoltage);

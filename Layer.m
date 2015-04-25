@@ -49,7 +49,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             p.addParameter('FromExtrudeTag', '', @ischar);
             p.addParameter('Distance', 1, @isnumeric);
             p.addParameter('zPosition', 0, ...
-                @(x) isnumeric(x) && length(x) == 1);
+                @(x) isnumeric(x) && isscalar(x));
             
             p.parse(varargin{:});
             
@@ -117,7 +117,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             inputObjectCell = cell( ...
                 obj.extrude.selection('input').objects());
             
-            assert(length(inputObjectCell) == 1, ...
+            assert(isscalar(inputObjectCell), ...
                    ['Layer expects one workplane for the extrude ' ...
                     'feature. Found %d.'], length(inputObjectCell));
                             
@@ -223,7 +223,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            assert(isnumeric(newPosition) && length(newPosition) == 1, ...
+            assert(isnumeric(newPosition) && isscalar(newPosition), ...
                    'The new position is not valid.');
             
             obj.workPlane.set('quickz', newPosition);
