@@ -94,7 +94,12 @@ classdef Gate < comsolkit.Layer
             %  delete(obj)
             
             delete@comsolkit.Layer(obj);
-            obj.hModel.es.feature().remove(obj.potentialTag);
+            try
+                obj.hModel.es.feature().remove(obj.potentialTag);
+            catch
+                warning('Could not remove Potential %s from server.', ...
+                        obj.potentialTag);
+            end
         end
         
         

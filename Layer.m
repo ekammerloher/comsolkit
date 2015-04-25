@@ -327,9 +327,14 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            workplaneTag = obj.workPlane.tag();
-            obj.hModel.geom.feature().remove(obj.extrudeTag);
-            obj.hModel.geom.feature().remove(workplaneTag);
+            try
+                workplaneTag = obj.workPlane.tag();
+                obj.hModel.geom.feature().remove(obj.extrudeTag);
+                obj.hModel.geom.feature().remove(workplaneTag);
+            catch
+                warning('Could not remove Layer %s from server.', ...
+                        obj.extrudeTag);
+            end
         end
         
         

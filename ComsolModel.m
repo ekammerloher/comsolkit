@@ -285,10 +285,12 @@ classdef ComsolModel < handle % All copies are references to same object
         end
         
         
-        function param = get_param(obj, paramName)
+        function [param, description] = get_param(obj, paramName)
             % get_param Wrapper to get comsol model parameters.
             %
-            %  get_param(obj, paramName)
+            %  [param, description] = get_param(obj, paramName)
+            
+            import com.comsol.model.*;
             
             % Get all parameter names.
             paramCell = cell(obj.model.param.varnames());
@@ -296,6 +298,7 @@ classdef ComsolModel < handle % All copies are references to same object
             
             if isValidParam
                 param = char(obj.model.param.get(paramName));
+                description = char(obj.model.param.descr(paramName));
             else
                 warning('Parameter %s undefined.', paramName);
             end
@@ -308,10 +311,35 @@ classdef ComsolModel < handle % All copies are references to same object
             %  set_param(obj, paramName, value)
             %  set_param(obj, paramName, value, description)
             
+            import com.comsol.model.*;
+            
             if nargin > 3
                 obj.model.param.set(paramName, value, varargin{1});
             else
                 obj.model.param.set(paramName, value);
+            end
+        end
+        
+        
+        function print_param_info(obj)
+            % print_param_info Prints parameter information in a table.
+            %
+            %  print_param_info(obj)
+            
+            import com.comsol.model.*;
+            
+            % Get all parameter names.
+            paramCell = cell(obj.model.param.varnames());
+            
+            fprintf('%-30s %-30s %s\n','Parameter', 'Value', ...
+                    'Description');
+            fprintf([repmat('-', 1, 93), '\n']);
+            
+            % paramCell is n x 1. For wants 1 x n, so transpose.
+            for paramName = paramCell'
+                [paramValue, description] = obj.get_param(paramName{1});
+                fprintf('%-30s %-30s %s\n', paramName{1}, paramValue, ...
+                        description);
             end
         end
         
@@ -355,5 +383,77 @@ classdef ComsolModel < handle % All copies are references to same object
             
             loadedObj = obj;
         end
-    end
+        
+        
+        function server_connect(varargin)
+            % server_connect Initialize live link and connect to server.
+            %
+            %  server_connect()
+            %  server_connect(ipAdress, port)
+            %  server_connect(ipAdress, port)
+            %  server_connect(ipAdress, port, user, passWord)
+            
+            
+            import com.comsol.model.util.*;
+            
+            switch nargin
+                case 0
+                    mphstart();
+                case 2
+                    ipAdress = varargin{1};
+                    port = varargin{2};
+                    
+                    assert(ischar(ipAdress) && isnumeric(port), ...
+                           'ipAdress is a string and port a number.');
+                    try
+                        mphstart(ipAdress, port);
+                    catch
+                        ModelUtil.connect(ipAdress, port);
+                    end
+                case 4
+                    ipAdress = varargin{1};
+                    port = varargin{2};
+                    user = varargin{3};
+                    passWord = varargin{4};
+                    
+                    assert(ischar(ipAdress) && isnumeric(port), ...
+                           'ipAdress is a string and port a number.');
+                    assert(ischar(user) && ischar(passWord), ...
+                           'user and passWord are strings.');
+                    try
+                        mphstart(ipAdress, port, user, passWord);
+                    catch
+                        ModelUtil.connect(ipAdress, port, user, passWord);
+                    end
+                otherwise
+                    error(['Wrong number of arguments. See help ' ...
+                           'comsolkit.ComsolModel.connect_server']);
+            end
+            
+            % Command timeout in seconds. Account for connectivity delays.
+            ModelUtil.setServerBusyHandler(ServerBusyHandler(5));
+        end
+        
+        
+        function server_disconnect()
+            % server_disconnect Disconnect from comsol server.
+            %
+            %  server_disconnect()
+            
+            import com.comsol.model.util.*;
+            
+            ModelUtil.disconnect();
+        end
+        
+        
+        function modelCell = get_server_tags()
+            % get_server_tags Returns tags of models on the server.
+            %
+            %  modelCell = get_server_tags()
+            
+            import com.comsol.model.util.*;
+            
+            modelCell = cell(ModelUtil.tags());
+        end
+    end    
 end

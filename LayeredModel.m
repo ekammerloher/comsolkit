@@ -201,6 +201,7 @@ classdef LayeredModel < comsolkit.ComsolModel
             fprintf('    %-30s %-30s %-15s %-15s\n','Class', 'Name', ...
                     'zPosition', 'totDistance');
             fprintf([repmat('-', 1, 93), '\n']);
+            
             for index = 1:length(obj.layerArray)
                 layer = obj.layerArray(index);
                 

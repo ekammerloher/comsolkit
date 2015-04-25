@@ -53,7 +53,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
         end
         
         
-        function import_gds_file(obj, gdsFile)
+        function [coordinateCell, nameCell] = import_gds_file(obj, gdsFile)
             % import_gds_file Import gds structures into layerArray.
             %
             %  import_gds_file(obj, gds_file)
@@ -88,18 +88,61 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             
             % Find root structure element.
             topName = topstruct(gdsLibrary);
-            assert(length(topName) == 1, 'Only one top structure allowed');
+            assert(ischar(topName), 'Only one top structure allowed');
             
             topStruct = obj.struct_by_name(gdsLibrary, topName);
             
+            % The case with one element per structure.
+            % If first element reference, assume all.
+            if is_ref(topStruct(1))
+                % Iterate over reference structures, get real structures.
+                nameCell = cell(1, numel(topStruct));
+                coordinateCell = cell(1, numel(topStruct));
+                for i = 1:numel(topStruct)
+                    % Get referenced structure by name.
+                    referenceStruct = obj.struct_by_name(gdsLibrary, ...
+                                                get(topStruct(i),'sname'));
+
+                     % Include offset but no strans (rotation, scaling).
+                    xyOffset = get(topStruct(i),'xy');
+                    
+                    % This struct has allways one child.
+                    xy = get(referenceStruct(1),'xy');
+                    xy = xy{1};
+                    
+                    xy = bsxfun(@plus, xy, xyOffset); % Add offset.
+                    
+                    xy = xy .* ratio;
+                    coordinateCell{i} = {xy};
+                    nameCell{i} = referenceStruct.sname;
+                end
+            else
+                nameCell = {};
+                coordinateCell = cell(1, numel(topStruct));
+                for i = 1:numel(topStruct)
+                    if is_ref(topStruct(i))
+                        % This should not happen.
+                        warning('Skipped reference element %d.', i);
+                        continue;
+                    end
+                    
+                    xy = get(topStruct(i),'xy');
+                    xy = xy{1};
+                    xy = xy .* ratio;
+                    coordinateCell{i} = {xy};
+                end
+            end
         end
     end
     methods(Access = private)
     	function s = struct_by_name(~, lib, str)
             % struct_by_name  Helper returns gds_structs by name.
-            structNames = cellfun(@sname, lib(:), 'UniformOutput', false);
-            s_logic = cellfun(@(x) isequal(x,str), structNames);
-            s = lib(s_logic);
+            %
+            % s = struct_by_name(~, lib, str)
+            
+            nameCell = cellfun(@sname, lib(:), 'UniformOutput', false);
+            logicCell = cellfun(@(x) isequal(x,str), nameCell);
+            s = lib(logicCell);
             if iscell(s) % FIX: some programs save gds differently
                 s = s{1};
             end
