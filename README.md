@@ -11,4 +11,4 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 3. From the gdsii-toolbox put only the Basic/ folder (with subfolders) on the MATLAB® PATH (rest of the toolbox is not required).
 
 
-*MATLAB is a registered trademark of The MathWorks, Inc. All other trademarks are the property of their respective owners.*
+*MATLAB COMSOL Multiphysics are registered trademark of The MathWorks, Inc and COMSOL Inc. respectively. All other trademarks are the property of their respective owners.*
