@@ -4,13 +4,11 @@ classdef GateLayoutModel < comsolkit.LayeredModel
     properties(Dependent)
         es % Handle to the electrostatic physics feature.
         std % Handle to the stationary study feature for solving the model.
-        mesh % Handle to the mesh of the model.
     end
     properties(Constant)
         BASE_TAG_ES = 'es'; % Tag of the electrostatic physics feature.
         BASE_TAG_STD = 'std'; % Tag of the study feature.
         BASE_TAG_STAT = 'stat'; % Tag of the stationary feature.
-        BASE_TAG_MESH = 'mesh'; % Base mesh tag.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
         DEFAULT_POT_VAR = 'mod1.V'; % Evaluate this for the potential.
     end
@@ -38,16 +36,6 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                                          obj.geom.tag());
             end
             
-            % Create a mesh, if it does not exist.
-            meshIndex = obj.model.mesh.index(obj.BASE_TAG_MESH);
-            
-            if meshIndex < 0
-                mesh = obj.model.mesh.create(obj.BASE_TAG_MESH, ...
-                                                obj.geom.tag());
-                mesh.feature.create('ftet', 'FreeTet');
-                mesh.feature('size').set('hauto', 3);
-            end
-            
             % Create stationary study, if it does not exist.
             stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
             
@@ -73,19 +61,6 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                    obj.BASE_TAG_ES);
                
             es = obj.model.physics(obj.BASE_TAG_ES);
-        end
-        
-        
-        function mesh = get.mesh(obj)
-            
-            import com.comsol.model.*;
-            
-            meshIndex = obj.model.mesh.index(obj.BASE_TAG_MESH);
-            
-            assert(meshIndex >= 0, 'Could not find mesh %s.', ...
-                   obj.BASE_TAG_MESH);
-               
-            mesh = obj.model.mesh(obj.BASE_TAG_MESH);
         end
         
         
@@ -158,9 +133,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                 potential = reshape(potential, mRows, nColms);
             end
         end
-                              
-            
-        
+                 
         
         function [coordinateCell, nameCell] = import_gds_file(obj, gdsFile)
             % import_gds_file Import gds structures into layerArray.
@@ -244,6 +217,40 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                 end
             end
         end
+        
+        
+        function choose_domain_region(obj)
+            % choose_domain_region Defines domain region on layerArray.
+            %
+            %  choose_domain_region(obj)
+            %
+            %  Usage:
+            %  Draw a rectangle around the region to consider and
+            %  double-click inside the rectangle.
+            
+            f = figure;
+            set(f, 'Name', ['Select domain region and double-click ' ...
+                'inside to confirm.']);
+            obj.layerArray.plot();
+            h = imrect;
+            pos = wait(h);
+            fprintf('Dimensions:\n\torigin_x: %f\n\torigin_y: %f\n', ...
+                    pos(1), pos(2));
+            fprintf('\tl_domain: %f\n\tw_domain: %f\n', pos(3), pos(4));
+            
+            fprintf(['Set this parameters in models created from a ' ...
+                     'template via set_param:\n']);
+                 
+            fprintf('\t%s.set_param(''origin_x'', %f);\n', ...
+                    inputname(1), pos(3));
+            fprintf('\t%s.set_param(''origin_y'', %f);\n', ...
+                    inputname(1), pos(4));
+            fprintf('\t%s.set_param(''l_domain'', %f);\n', ...
+                    inputname(1), pos(1));
+            fprintf('\t%s.set_param(''w_domain'', %f);\n', ...
+                    inputname(1), pos(2));
+            close(f);
+        end    
     end
     methods(Access = private)
     	function s = struct_by_name(~, lib, str)
