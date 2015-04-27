@@ -4,13 +4,15 @@ classdef GateLayoutModel < comsolkit.LayeredModel
     properties(Dependent)
         es % Handle to the electrostatic physics feature.
         std % Handle to the stationary study feature for solving the model.
+        mesh % Handle to the mesh of the model.
     end
     properties(Constant)
-        BASE_TAG_ES = 'es'; % Tag of electrostatic physics feature.
-        BASE_TAG_STD = 'std'; % Tag of study feature.
-        BASE_TAG_STAT = 'stat'; % Tag of stationary feature.
+        BASE_TAG_ES = 'es'; % Tag of the electrostatic physics feature.
+        BASE_TAG_STD = 'std'; % Tag of the study feature.
+        BASE_TAG_STAT = 'stat'; % Tag of the stationary feature.
+        BASE_TAG_MESH = 'mesh'; % Base mesh tag.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
-        DEFAULT_POT_VAR = 'mod1.V'; % Retrieve this for the potential.
+        DEFAULT_POT_VAR = 'mod1.V'; % Evaluate this for the potential.
     end
     
     methods
@@ -34,6 +36,16 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                 obj.model.physics.create(obj.BASE_TAG_ES, ...
                                          'Electrostatics', ...
                                          obj.geom.tag());
+            end
+            
+            % Create a mesh, if it does not exist.
+            meshIndex = obj.model.mesh.index(obj.BASE_TAG_MESH);
+            
+            if meshIndex < 0
+                mesh = obj.model.mesh.create(obj.BASE_TAG_MESH, ...
+                                                obj.geom.tag());
+                mesh.feature.create('ftet', 'FreeTet');
+                mesh.feature('size').set('hauto', 3);
             end
             
             % Create stationary study, if it does not exist.
@@ -61,6 +73,19 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                    obj.BASE_TAG_ES);
                
             es = obj.model.physics(obj.BASE_TAG_ES);
+        end
+        
+        
+        function mesh = get.mesh(obj)
+            
+            import com.comsol.model.*;
+            
+            meshIndex = obj.model.mesh.index(obj.BASE_TAG_MESH);
+            
+            assert(meshIndex >= 0, 'Could not find mesh %s.', ...
+                   obj.BASE_TAG_MESH);
+               
+            mesh = obj.model.mesh(obj.BASE_TAG_MESH);
         end
         
         
@@ -100,6 +125,18 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             %                   they do not correspond to mesh vertices,
             %                   values are interpolated (3 x n size).
             %  mRows, nColms: Reshape the data, when on a grid (optional).
+            %
+            %  Example:
+            %   precision = 10;
+            %   l_domain = 3000;
+            %   w_domain = 1200;
+            %   x0 = 0:precision:l_domain;
+            %   y0 = 0:precision:w_domain;
+            %   z0 = [-100]; % Depth.
+            %   [x,y,z] = meshgrid(x0,y0,z0);
+            %   xyz = [x(:),y(:),z(:)]';
+            %   pot = compute_interpolated_potential(xyz, ...
+            %           length(x0), length(y0));
             
             import com.comsol.model.*;
             
