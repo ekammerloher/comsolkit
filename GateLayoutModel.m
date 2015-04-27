@@ -249,6 +249,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                     inputname(1), pos(1));
             fprintf('\t%s.set_param(''w_domain'', %f);\n', ...
                     inputname(1), pos(2));
+                
             close(f);
         end    
     end

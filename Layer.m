@@ -127,7 +127,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             assert(workplaneIndex >= 0, 'Could not find workplane %s.', ...
                    inputObjectCell{1});
             
-            workPlane = obj.hModel.geom.feature( inputObjectCell{1});
+            workPlane = obj.hModel.geom.feature(inputObjectCell{1});
         end
         
         
@@ -382,6 +382,43 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                           obj.name, obj.zPosition, ...
                           maxDistance - minDistance);
         end
+        
+        
+        function indexCell = choose_polygon_indices(obj)
+            % choose_polygon_indices Returns mask of selected indices.
+            %
+            %  indexCell = choose_polygon_indices(obj)
+            %
+            %  Usage:
+            %  Draw a polygon selection around the region of interest and
+            %  double-click inside the polygon.
+            
+            objArray = [ obj ];
+            assert(isscalar(objArray), 'This function is not vectorized.');
+            
+            f = figure;
+            set(f, 'Name', ['Select a closed region and double-click ' ...
+                'inside to confirm.']);
+            obj.plot();
+            h = impoly('Closed', true);
+            pos = wait(h);
+            
+            polygonCell = obj.polygonCell;
+            indexCell = {};
+            for polygon = polygonCell
+                xPolygon = polygon{1}(:,1);
+                yPolygon = polygon{1}(:,2);
+                xSelection = pos(:,1);
+                ySelection = pos(:,2);
+                
+                % Returns indices inside the selection region.
+                in = inpolygon(xPolygon, yPolygon, xSelection, ySelection);
+                
+                indexCell{end+1} = in;
+            end
+            
+            close(f);
+        end 
     end
     methods(Sealed)
         function plot(obj, varargin)
