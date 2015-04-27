@@ -3,9 +3,12 @@ classdef GateLayoutModel < comsolkit.LayeredModel
     
     properties(Dependent)
         es % Handle to the electrostatic physics feature.
+        std % Handle to the stationary study feature for solving the model.
     end
     properties(Constant)
         BASE_TAG_ES = 'es'; % Tag of electrostatic physics feature.
+        BASE_TAG_STD = 'std'; % Tag of study feature.
+        BASE_TAG_STAT = 'stat'; % Tag of stationary feature.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
     end
     
@@ -31,6 +34,19 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                                          'Electrostatics', ...
                                          obj.geom.tag());
             end
+            
+            % Create stationary study, if it does not exist.
+            stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
+            
+            if stdIndex < 0
+                study = obj.model.study.create(obj.BASE_TAG_STD);
+                study.feature.create(obj.BASE_TAG_STAT, 'Stationary');
+            else
+                study = obj.model.study(obj.BASE_TAG_STD);
+                statIndex = study.feature().index(obj.BASE_TAG_STAT);
+                assert(statIndex >= 0, ...
+                       'No stationary study feature found.');
+            end
         end
         
         
@@ -41,6 +57,16 @@ classdef GateLayoutModel < comsolkit.LayeredModel
                    obj.BASE_TAG_ES);
                
             es = obj.model.physics(obj.BASE_TAG_ES);
+        end
+        
+        
+        function std = get.std(obj)
+            stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
+            
+            assert(stdIndex >= 0, 'Could not find study %s.', ...
+                   obj.BASE_TAG_STD);
+               
+            std = obj.model.study(obj.BASE_TAG_STD);
         end
         
         
