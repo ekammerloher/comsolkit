@@ -431,7 +431,8 @@ classdef ComsolModel < handle % All copies are references to same object
             end
             
             % Command timeout in seconds. Account for connectivity delays.
-            ModelUtil.setServerBusyHandler(ServerBusyHandler(5));
+            % TODO: Cannot find this class in imports?
+            % ModelUtil.setServerBusyHandler(ServerBusyHandler(5));
         end
         
         

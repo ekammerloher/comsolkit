@@ -10,6 +10,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
         BASE_TAG_STD = 'std'; % Tag of study feature.
         BASE_TAG_STAT = 'stat'; % Tag of stationary feature.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
+        DEFAULT_POT_VAR = 'mod1.V'; % Retrieve this for the potential.
     end
     
     methods
@@ -51,6 +52,9 @@ classdef GateLayoutModel < comsolkit.LayeredModel
         
         
         function es = get.es(obj)
+            
+            import com.comsol.model.*;
+            
             esIndex = obj.model.physics.index(obj.BASE_TAG_ES);
             
             assert(esIndex >= 0, 'Could not find electrostatics %s.', ...
@@ -61,6 +65,9 @@ classdef GateLayoutModel < comsolkit.LayeredModel
         
         
         function std = get.std(obj)
+            
+            import com.comsol.model.*;
+            
             stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
             
             assert(stdIndex >= 0, 'Could not find study %s.', ...
@@ -77,6 +84,45 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             
             savedObj = saveobj@comsolkit.ComsolModel(obj);
         end
+        
+        
+        function potential = compute_interpolated_potential(obj, ...
+                                coordinateArray, varargin)
+            % compute_interpolated_potential Solves model, returns pot.
+            %
+            %  potential = compute_interpolated_potential(obj, ...
+            %                    coordinateArray)
+            %  potential = compute_interpolated_potential(obj, ...
+            %                    coordinateArray, mRows, nColms)
+            %
+            %  Parameters:
+            %  coordinateArray: Solution is evaluated at this points, when
+            %                   they do not correspond to mesh vertices,
+            %                   values are interpolated (3 x n size).
+            %  mRows, nColms: Reshape the data, when on a grid (optional).
+            
+            import com.comsol.model.*;
+            
+            assert(nargin == 2 || nargin == 4, ...
+                   'Wrong number of arguments');
+            assert(isnumeric(coordinateArray) && ...
+                   size(coordinateArray, 2) == 3, ...
+                   'Wrong coordinateArray format');
+            
+            obj.std.run; % Solve the model.
+            
+            % Retrieve interpolated potential values.
+            potential = mphinterp(obj.model, obj.DEFAULT_POT_VAR, ...
+                                  'coord', coordinateArray);
+                              
+            if nargin == 4
+                mRows = varargin{1};
+                nColms = varargin{2};
+                potential = reshape(potential, mRows, nColms);
+            end
+        end
+                              
+            
         
         
         function [coordinateCell, nameCell] = import_gds_file(obj, gdsFile)
@@ -105,6 +151,8 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             %       E    E    E    E    E     (element contains XY coords)
             
             % TODO: Extend import to deal with multiple polygons per gate.
+            
+            assert(exist(gdsFile, 'file') == 2, 'File does not exist.');
             
             gdsLibrary = read_gds_library(gdsFile);
             
