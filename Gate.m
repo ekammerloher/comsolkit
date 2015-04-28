@@ -7,9 +7,12 @@ classdef Gate < comsolkit.Layer
     end
     properties(Constant)
         BASE_TAG_POTENTIAL = 'layer_pot'; % Base potential string.
+        BASE_TAG_FLOATING = 'layer_fp'; % Base floating potential string.
+        FLOATING_NAME_PREFIX = 'fp_'; % Prefix of floating potential label.
     end
     properties(Access=private)
         potentialTag % Tag to the electrostatic potential of the gate.
+        floatingTag % Tag to the floating potential of the gate.
     end
     
     methods
@@ -53,6 +56,9 @@ classdef Gate < comsolkit.Layer
             end
             
             obj.voltage = p.Results.Voltage;
+            
+            % Used to introduce floating potentials when voltage = NaN.
+            obj.floatingTag = '';
         end
         
         
@@ -66,6 +72,7 @@ classdef Gate < comsolkit.Layer
                    obj.hModel.es.tag(), obj.potentialTag); 
                
             potential = obj.hModel.es.feature(obj.potentialTag);
+            potential.label(obj.name);
         end
         
         
@@ -83,8 +90,45 @@ classdef Gate < comsolkit.Layer
             
             assert(isnumeric(newVoltage) && isscalar(newVoltage), ...
                    'New voltage is not valid.');
-               
+            
             obj.potential.set('V0', newVoltage);
+            
+            if isnan(newVoltage)
+                obj.potential.active(false);
+                if isempty(obj.floatingTag)
+                    obj.floatingTag = ...
+                        obj.hModel.es.feature().uniquetag( ...
+                        obj.BASE_TAG_FLOATING);
+                    floating = obj.hModel.es.feature.create( ...
+                               obj.floatingTag, 'FloatingPotential', 2);
+                            
+                    floating.selection.named(obj.boundaryTag);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                else
+                    hasFloating = obj.hModel.es.feature().index( ...
+                                    obj.floatingTag);
+                
+                    assert(hasFloating >= 0, '%s has no floating %s.', ...
+                           obj.hModel.es.tag(), obj.floatingTag); 
+               
+                    floating = obj.hModel.es.feature(obj.floatingTag);
+                    floating.active(true);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                end
+                                        
+                                    
+            else
+                obj.potential.active(true);
+                hasFloating = obj.hModel.es.feature().index( ...
+                                    obj.floatingTag);
+                
+                assert(hasFloating >= 0, '%s has no floating %s.', ...
+                       obj.hModel.es.tag(), obj.floatingTag); 
+
+                floating = obj.hModel.es.feature(obj.floatingTag);
+                floating.active(false);
+                floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+            end
         end
         
         
