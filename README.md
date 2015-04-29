@@ -32,7 +32,7 @@ Objects of the class [comsolkit.Layer](Layer.m) populate `layerArray`. They bund
 The [comsolkit.Gate](Gate.m) class inherits from `comsolkit.Layer` and adds funcionality to mangage electric potentials.
 
 # Philosophy
-This project aims to supplement your workflow in Comsol from Matlab. It is not intended to replicate the exelent LiveLink for Matlab. Just streamline the specific process of gate layout creating, manipulation and optimization. For this reasons other important aspects of a general Comsol workflow like meshing, etc. should be done using the default LiveLink from Matlab or the Comsol GUI.
+This project aims to supplement your workflow in Comsol from Matlab. It is not intended to replicate the exelent LiveLink for Matlab. Just streamline the specific process of gate layout creation, manipulation and optimization. For this reasons other important aspects of a general Comsol workflow like meshing, etc. should be done using the default LiveLink from Matlab or the Comsol GUI.
 
 # Coding Conventions
 The code is written in a style based on http://www.ee.columbia.edu/~marios/matlab/MatlabStyle1p5.pdf
