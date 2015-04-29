@@ -16,6 +16,7 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 - All classes, constructors and methods are fully documented. Try `help <functinname>` to understand their behaviour
 - For an overview of classes try, e.g. `doc comsolkit.GateLayoutModel` or `doc comsolkit.Gate`
 - Calling the objects without semicolon revels the porperties, which gives a good overview as well
+- It is recomended to start out from a template Comsol model and use comsolkit to work on it. templates are provided in [tempate/](template/). See the [README](template/README.md) of the template folder.
 
 # Structure
 comsolkit is tag driven. Properties are internally accessed by tag from the corresponding Comsol features. All features created by comsolkit have a tag prefix `'layer_'`.
