@@ -37,7 +37,7 @@ This project aims to supplement your workflow in Comsol from Matlab. It is not i
 # Coding Conventions
 The code is written in a style based on http://www.ee.columbia.edu/~marios/matlab/MatlabStyle1p5.pdf
 
-Briefly: properties (camel case starting with a lower case letter), constants (upper case seperated by underscore), functions (lower case seperated by underscore), classes ( camel case starting with a upper case letter).
+Briefly: properties (camel case starting with a lower case letter), constants (upper case seperated by underscore), functions (lower case seperated by underscore), classes ( camel case starting with an upper case letter).
 
 
 
