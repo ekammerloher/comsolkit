@@ -119,15 +119,17 @@ classdef Gate < comsolkit.Layer
                                     
             else
                 obj.potential.active(true);
-                hasFloating = obj.hModel.es.feature().index( ...
-                                    obj.floatingTag);
-                
-                assert(hasFloating >= 0, '%s has no floating %s.', ...
-                       obj.hModel.es.tag(), obj.floatingTag); 
+                if ~isempty(obj.floatingTag)
+                    hasFloating = obj.hModel.es.feature().index( ...
+                                        obj.floatingTag);
 
-                floating = obj.hModel.es.feature(obj.floatingTag);
-                floating.active(false);
-                floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                    assert(hasFloating >= 0, '%s has no floating %s.', ...
+                           obj.hModel.es.tag(), obj.floatingTag); 
+
+                    floating = obj.hModel.es.feature(obj.floatingTag);
+                    floating.active(false);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                end
             end
         end
         
@@ -164,6 +166,8 @@ classdef Gate < comsolkit.Layer
             %
             %  Parameters:
             %  hModel: ComsolModel object or a derived object.
+            
+            % TODO: Clear floating potential feature.
             
             import com.comsol.model.*;
             
