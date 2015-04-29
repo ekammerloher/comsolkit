@@ -32,6 +32,9 @@ classdef Gate < comsolkit.Layer
             %  %%% when creating from existing extruded workplane/pot. %%%
             %  FromExtrudeTag: Tag of an existing extrude feature
             %  FromPotentialTag: Tag of an existing electric potential
+
+            assert(isa(hModel, 'comsolkit.GateLayoutModel'), ...
+                   'hModel has to be of class comsolkit.GateLayoutModel');
             
             p = inputParser;
             p.KeepUnmatched = true;

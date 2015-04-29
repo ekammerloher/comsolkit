@@ -12,6 +12,7 @@ gl.plot(); % Plots geometry of the model.
 [coordinateCell, nameCell] = gl.import_gds_file('LFL_v1.gds'); % gdsii-toolbox can sometimes crash matlab. Save your work here.
 gl.batch_add_layer(coordinateCell, nameCell, gl.DEFAULT_GATE_CLASS); % Gate objects inherit from Layer. Layers live in gl.layerArray.
 [gl.layerArray(:).distance] = deal(30); % This is the gate thickness, default is 1. Computation time improves if this is >1.
+% The distance cannot be zero, since consolkit relies on domain type geometry to setup boundary conditions.
 gl.layerArray(1).name = 'gate1'; % Rename the gate.
 % gl.layerArray(1).zPosition = 2; % Change the z position of the gate.
 gl.print_layer_info();
