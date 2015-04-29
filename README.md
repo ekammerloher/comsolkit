@@ -11,7 +11,7 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 3. From the gdsii-toolbox put only the `Basic/` folder (with subfolders) on the MATLAB® PATH (rest of the toolbox is not required).
 
 # Usage
-- comsolkit syncs changes both ways. Change features in comsol or properties in matlab, it will stay in sync
+- comsolkit syncs changes both ways. Change features in Comsol or properties in Matlab, it will stay in sync
 - Check out the [workflow.m](workflow.m) script. It contains one possible workflow.
 - All classes, constructors and methods are fully documented. Try `help <functinname>` to understand their behaviour
 - For an overview of classes try, e.g. `doc comsolkit.GateLayoutModel` or `doc comsolkit.Gate`
