@@ -67,10 +67,10 @@ classdef ComsolModel < handle % All copies are references to same object
                        'a model on the server by tag.'], 'ComsolModel');
                    
             elseif isFromFile % Load from a file on the file system.
-                if isUnitDefined || isDimensionDefined
-                    warning(['LengthUnit and/or GeomDimension ' ...
-                             'ignored. Model created from file/tag.']);
-                end
+                % if isUnitDefined || isDimensionDefined
+                %     warning(['LengthUnit and/or GeomDimension ' ...
+                %              'ignored. Model created from file/tag.']);
+                % end
                 
                 if exist(p.Results.FromFile, 'file') == 2
                     modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
@@ -82,10 +82,10 @@ classdef ComsolModel < handle % All copies are references to same object
                 end
                 
             elseif isFromTag % Load from Comsol Server.
-                if isUnitDefined || isDimensionDefined
-                    warning(['LengthUnit and/or GeomDimension ' ...
-                             'ignored. Model created from file/tag.']);
-                end
+                % if isUnitDefined || isDimensionDefined
+                %     warning(['LengthUnit and/or GeomDimension ' ...
+                %              'ignored. Model created from file/tag.']);
+                % end
                 
                 modelTagCell = cell(ModelUtil.tags());
                 isValidTag = ismember(p.Results.FromTag, modelTagCell);
@@ -389,9 +389,8 @@ classdef ComsolModel < handle % All copies are references to same object
             % server_connect Initialize live link and connect to server.
             %
             %  server_connect()
-            %  server_connect(ipAdress, port)
-            %  server_connect(ipAdress, port)
-            %  server_connect(ipAdress, port, user, passWord)
+            %  server_connect(ipAddress, port)
+            %  server_connect(ipAddress, port, user, passWord)
             
             import com.comsol.model.*;
             import com.comsol.model.util.*;
@@ -400,30 +399,30 @@ classdef ComsolModel < handle % All copies are references to same object
                 case 0
                     mphstart();
                 case 2
-                    ipAdress = varargin{1};
+                    ipAddress = varargin{1};
                     port = varargin{2};
                     
-                    assert(ischar(ipAdress) && isnumeric(port), ...
-                           'ipAdress is a string and port a number.');
+                    assert(ischar(ipAddress) && isnumeric(port), ...
+                           'ipAddress is a string and port a number.');
                     try
-                        mphstart(ipAdress, port);
+                        mphstart(ipAddress, port);
                     catch
-                        ModelUtil.connect(ipAdress, port);
+                        ModelUtil.connect(ipAddress, port);
                     end
                 case 4
-                    ipAdress = varargin{1};
+                    ipAddress = varargin{1};
                     port = varargin{2};
                     user = varargin{3};
                     passWord = varargin{4};
                     
-                    assert(ischar(ipAdress) && isnumeric(port), ...
-                           'ipAdress is a string and port a number.');
+                    assert(ischar(ipAddress) && isnumeric(port), ...
+                           'ipAddress is a string and port a number.');
                     assert(ischar(user) && ischar(passWord), ...
                            'user and passWord are strings.');
                     try
-                        mphstart(ipAdress, port, user, passWord);
+                        mphstart(ipAddress, port, user, passWord);
                     catch
-                        ModelUtil.connect(ipAdress, port, user, passWord);
+                        ModelUtil.connect(ipAddress, port, user, passWord);
                     end
                 otherwise
                     error(['Wrong number of arguments. See help ' ...

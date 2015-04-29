@@ -172,6 +172,15 @@ classdef LayeredModel < comsolkit.ComsolModel
                              [1:startIndex-1 stopIndex+1:end]);
         end
         
+
+        function remove_layer(obj, index)
+            % remove_layer Remove a layer index from layerArray.
+            %
+            %  remove_layer(obj, index)
+            
+            obj.batch_remove_layer(index, index);
+        end
+
         
         function remove_all_layers(obj)
             % remove_all_layers Remove all layers from layerArray.

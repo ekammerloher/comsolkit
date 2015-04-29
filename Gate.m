@@ -167,8 +167,6 @@ classdef Gate < comsolkit.Layer
             %  Parameters:
             %  hModel: ComsolModel object or a derived object.
             
-            % TODO: Clear floating potential feature.
-            
             import com.comsol.model.*;
             
             assert(isa(hModel, 'comsolkit.GateLayoutModel'), ...
@@ -183,8 +181,12 @@ classdef Gate < comsolkit.Layer
                 isPotential = strncmp(featureTag, ...
                               comsolkit.Gate.BASE_TAG_POTENTIAL, ...
                               length(comsolkit.Gate.BASE_TAG_POTENTIAL));
-               
-                if isPotential
+
+                isFloating = strncmp(featureTag, ...
+                             comsolkit.Gate.BASE_TAG_FLOATING, ...
+                             length(comsolkit.Gate.BASE_TAG_FLOATING));
+
+                if isPotential || isFloating
                     removeCell{end+1} = featureTag;
                 end
             end
