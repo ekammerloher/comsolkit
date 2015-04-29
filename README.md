@@ -2,7 +2,7 @@
 Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, tailored for gate layout optimisation in heterostructures.
 
 # Requirements
-- Configured https://github.com/ulfgri/gdsii-toolbox (requires mex-file compilation, ask me)
+- (optinal, for gds-import) Configured https://github.com/ulfgri/gdsii-toolbox (requires mex-file compilation, ask me)
 - COMSOL Multiphysics® LiveLink™ for MATLAB® (tested with Version 5.0)
 
 # Installation
