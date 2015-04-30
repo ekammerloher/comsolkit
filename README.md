@@ -13,7 +13,7 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 # Usage
 - comsolkit syncs changes both ways. Change features in Comsol or properties in Matlab, it will stay in sync
 - Check out the [workflow.m](workflow.m) script. It contains one possible workflow.
-- All classes, constructors and methods are fully documented. Try `help <functinname>` to understand their behaviour
+- All classes, constructors and methods are fully documented. Try `help <functionname>` to understand their behaviour
 - For an overview of classes try, e.g. `doc comsolkit.GateLayoutModel` or `doc comsolkit.Gate`
 - Calling the objects without semicolon reveals the porperties, which gives a good overview as well
 - It is recomended to start out from a template Comsol model and use comsolkit to work on it. templates are provided in [tempate/](template/). See the [README](template/README.md) of the template folder.
