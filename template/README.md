@@ -22,18 +22,17 @@ There are particularly four parameters that are recommended: `origin_x`, `origin
 A simple two block template, suspended in a infinite elements elepsoid.
 
 #### Parameters
-- l_domain: Length of domains
-- w_domain: Width of domains
-- t_vac: Thickness of upper domain (default: 500)
-- t_hetero: Thickness of lower domain (default: 500)
-- origin_x, origin_y: Coordinates of lower left point of domains (x,y)
-- epsilon_vac: Dielectric constant of upper domain (default: 1)
-- epsilon_hetero: Dielectric constant of lower domain (default: 13)
-- t_2DEG: Depth of the 2DEG (default: -100)
-- charge_density: Surface charge density at the 2DEG (default: 0)
+- `l_domain`: Length of domains
+- `w_domain`: Width of domains
+- `t_vac`: Thickness of upper domain (default: 500)
+- `t_hetero`: Thickness of lower domain (default: 500)
+- `origin_x`, `origin_y`: Coordinates of lower left point of domains (x,y)
+- `epsilon_vac`: Dielectric constant of upper domain (default: 1)
+- `epsilon_hetero`: Dielectric constant of lower domain (default: 13)
+- `t_2DEG`: Depth of the 2DEG (default: -100)
+- `charge_density`: Surface charge density at the 2DEG (default: 0)
 
- #### Schematic
- 
+#### Schematic
  ```
            (side view)
       ---------------------   /\
