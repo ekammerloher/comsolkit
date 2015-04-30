@@ -320,6 +320,51 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         end
         
         
+        function obj = edit_polygon_cell(obj)
+            % edit_polygon_cell Edit the polygons by mouse.
+            %
+            % edit_polygon_cell(obj)
+            %
+            %  Usage:
+            %  Edit polygon vertices by moving them around. Create new
+            %  vertices or delete vertices.
+            
+            f = figure;
+            set(f, 'Name', ['Edit polygonCell vertices.' ...
+                'Double-click inside the red one to confirm.']);
+            obj.hModel.layerArray.plot('Color', [0.6 0.6 0.6]);
+            
+            polygonCell = obj.polygonCell;
+            % This will ensure the for loop is executed on an empty Layer.
+            if isempty(polygonCell)
+                polygonCell = {[]};
+            end
+            
+            handleArray = impoly.empty();
+            
+            for polygon = polygonCell
+                h = impoly(gca, polygon{1}, 'Closed', true);
+                handleArray(end+1) = h;
+            end
+            handleArray(end).setColor('r');
+            wait(handleArray(end));
+            
+            polygonCell = {};
+            for handle = handleArray
+                if ~isempty(handle.getPosition())
+                    position = handle.getPosition();
+                    % Close the polygon.
+                    position = [ position; position(1,:)];
+                    polygonCell{end+1} = position;
+                end
+            end
+            
+            obj.polygonCell = polygonCell;
+            
+            close(f);
+        end
+        
+        
         function delete(obj)
             % delete Removes the workplane/extrude-feature from the model.
             %
