@@ -4,3 +4,6 @@
 **/*.m~
 # Compiled MEX binaries (all platforms)
 **/*.mex*
+# Operation system generaed
+.DS_Store
+Thumbs.db
