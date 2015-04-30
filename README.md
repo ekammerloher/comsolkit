@@ -7,7 +7,7 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 
 # Installation
 1. Clone the repository or download and extract the zip-file version.
-2. Rename `comsolkit/` to `+comsolkit/` and put the parent folder on the MATLAB® PATH (this is a Matlab package).
+2. Rename `comsolkit/` to `+comsolkit/` and put the parent folder on the Matlab PATH (this is a Matlab package).
 3. From the gdsii-toolbox put only the `Basic/` folder (with subfolders) on the Matlab PATH (rest of the toolbox is not required).
 
 # Usage
