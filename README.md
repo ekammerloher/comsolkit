@@ -7,8 +7,8 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 
 # Installation
 1. Clone the repository or download and extract the zip-file version.
-2. Rename `comsolkit/` to `+comsolkit/` and put the parent folder on the MATLAB® PATH (this is a MATLAB® package).
-3. From the gdsii-toolbox put only the `Basic/` folder (with subfolders) on the MATLAB® PATH (rest of the toolbox is not required).
+2. Rename `comsolkit/` to `+comsolkit/` and put the parent folder on the MATLAB® PATH (this is a Matlab package).
+3. From the gdsii-toolbox put only the `Basic/` folder (with subfolders) on the Matlab PATH (rest of the toolbox is not required).
 
 # Usage
 - comsolkit syncs changes both ways. Change features in Comsol or properties in Matlab, it will stay in sync
@@ -19,7 +19,7 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 - It is recomended to start out from a template Comsol model and use comsolkit to work on it. templates are provided in [tempate/](template/). See the [README](template/README.md) of the template folder.
 
 # Structure
-comsolkit is tag driven. Properties are internally accessed by tag from the corresponding Comsol features. All features created by comsolkit have a tag prefix `'layer_'`.
+comsolkit is tag driven. Properties are internally accessed by tag from the corresponding Comsol features. All features created by comsolkit in Comsol have a tag prefix `'layer_'`.
 
 A base class [comsolkit.ComsolModel](ComsolModel.m) handles saving/loading and model management tasks.
 
