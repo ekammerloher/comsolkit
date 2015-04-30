@@ -35,7 +35,7 @@ gl.set_param('w_domain', 1078.341014);
 
 %% Enable surface charge density of 2DEG for sreening.
 chargeDensity = -1.60217657e-19 * 1e15; % WARNING: Superposition of potentials Phi_i per gate i does not work with this.
-gl.set_param('chargeDensity', chargeDensity);
+gl.set_param('charge_density', chargeDensity);
 
 %% Model 3D view.
 gl.plot(); % Gates should appear now in the model.
@@ -66,7 +66,7 @@ origin_x = str2double(gl1.get_param('origin_x'));
 origin_y = str2double(gl1.get_param('origin_y'));
 x0 = origin_x:precision:l_domain+origin_x;
 y0 = origin_y:precision:w_domain+origin_y;
-z0 = [-100]; % Depth.
+z0 = str2double(gl1.get_param('t_2DEG'));
 [x,y,z] = meshgrid(x0,y0,z0);
 xyz = [x(:),y(:),z(:)]'; % This is now a 3 x n of points to evaluate.
 
@@ -92,7 +92,7 @@ set(gca,'YDir','normal');
 gl1.layerArray.plot('Names', 'on');
 
 %% Get unit 1 potentials for all gates ans save them to pots array.
-gl.set_param('chargeDensity', 0); % Otherwise this will not make sense.
+gl.set_param('charge_density', 0); % Otherwise this will not make sense.
 
 pots = zeros(length(y0), length(x0), ...
     length(gl.layerArray)); % prepare array for results
