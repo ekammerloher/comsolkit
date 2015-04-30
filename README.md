@@ -1,4 +1,4 @@
-# comsolkit
+![comsolkit](/doc/logo.png?raw=true)
 Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, tailored for gate layout optimisation in heterostructures.
 
 # Requirements
