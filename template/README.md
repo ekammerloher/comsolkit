@@ -11,7 +11,7 @@ Since comsolkit is tag driven, some tags should be consistent in the template fi
 - The stationary study feature should have the tag `'stat'`
 - The potential is obtained by evaluating the expression `'mod1.V'`
 
-When there are more then one geometry feature (root feature containing the whole geometry tree), the first in the list is used.
+When there are more then one geometry features (root feature containing the whole geometry tree), the first in the list is used.
 
 ## Parameter driven template
 It is a good idea to define parts of a template, that might change depending on the situation using parameters (accessed by `set_param()` or `get_param()` in comsolkit).
@@ -22,17 +22,18 @@ There are particularly four parameters that are recommended: `origin_x`, `origin
 A simple two block template, suspended in a infinite elements elepsoid.
 
 #### Parameters
-   l_domain: Length of domains
-   w_domain: Width of domains
-   t_vac: Thickness of upper domain (default: 500)
-   t_hetero: Thickness of lower domain (default: 500)
-   origin_x, origin_y: Coordinates of lower left point of domains (x,y)
-   epsilon_vac: Dielectric constant of upper domain (default: 1)
-   epsilon_hetero: Dielectric constant of lower domain (default: 13)
-   t_2DEG: Depth of the 2DEG
-   charge_density: Surface charge density at the 2DEG
+- l_domain: Length of domains
+- w_domain: Width of domains
+- t_vac: Thickness of upper domain (default: 500)
+- t_hetero: Thickness of lower domain (default: 500)
+- origin_x, origin_y: Coordinates of lower left point of domains (x,y)
+- epsilon_vac: Dielectric constant of upper domain (default: 1)
+- epsilon_hetero: Dielectric constant of lower domain (default: 13)
+- t_2DEG: Depth of the 2DEG (default: -100)
+- charge_density: Surface charge density at the 2DEG (default: 0)
 
  #### Schematic
+ 
  ```
            (side view)
       ---------------------   /\
