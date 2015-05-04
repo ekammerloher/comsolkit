@@ -331,11 +331,15 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %  polygons. Close the figure to finish.
             
             hFigure = figure();
+            
+            % API: https://docs.oracle.com/javase/7/docs/ ...
+            % api/java/util/LinkedList.html
             coordinateList = java.util.LinkedList(); % Jave linked list.
             
             set(hFigure, 'Name', ['Edit polygonCell vertices. ' ...
-                'Double-click inside to confirm position. '
-                'Close the figure to finish.']);
+                'Double-click inside to confirm position. ' ...
+                'Close the figure to finish. ' ...
+                'Click in red one to start draw new polygons.']);
             obj.hModel.layerArray.plot('Color', [0.6 0.6 0.6]);
             
             % Retrive existing polygon coordinates.
@@ -389,8 +393,12 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                         continue;
                     end
                     
-                    % Make the polygon closed.
-                    position = [ position; position(1,:)];
+                    % Check if polygon is closed.
+                    if position(1,1) ~= position(end,1) || ...
+                       position(1,2) ~= position(end,2)
+                        % Make the polygon closed.
+                        position = [ position; position(1,:)];
+                    end
                     
                     polygonCell{end+1} = position;
                 end
