@@ -321,47 +321,83 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         
         
         function obj = edit_polygon_cell(obj)
-            % edit_polygon_cell Edit the polygons by mouse.
+            % edit_polygon_cell Edit/add polygons by mouse.
             %
             % edit_polygon_cell(obj)
             %
             %  Usage:
-            %  Edit polygon vertices by moving them around. Create new
-            %  vertices or delete vertices.
+            %  Add polygons by vertex. Double-click inside to confirm
+            %  position. Double click inside the red polygon to start new
+            %  polygons. Close the figure to finish.
             
-            f = figure;
-            set(f, 'Name', ['Edit polygonCell vertices.' ...
-                'Double-click inside the red one to confirm.']);
+            hFigure = figure();
+            coordinateList = java.util.LinkedList(); % Jave linked list.
+            
+            set(hFigure, 'Name', ['Edit polygonCell vertices. ' ...
+                'Double-click inside to confirm position. '
+                'Close the figure to finish.']);
             obj.hModel.layerArray.plot('Color', [0.6 0.6 0.6]);
             
+            % Retrive existing polygon coordinates.
             polygonCell = obj.polygonCell;
-            % This will ensure the for loop is executed on an empty Layer.
-            if isempty(polygonCell)
-                polygonCell = {[]};
-            end
             
-            handleArray = impoly.empty();
+            % Maintain a handle to the last polygon created.
+            lastHandle = impoly.empty();
             
+            % Add existing polygons first.
             for polygon = polygonCell
-                h = impoly(gca, polygon{1}, 'Closed', true);
-                handleArray(end+1) = h;
+                hPolygon = impoly(gca, polygon{1}, 'Closed', true);
+                lastHandle = hPolygon;
+                coordinateList.add(polygon{1});
+                
+                % This is java indexing starting from 0.
+                currentIndex = coordinateList.size-1;
+                % Update changes in the polygon using a listener.
+                addNewPositionCallback(hPolygon, ...
+                    @(pos) coordinateList.set(currentIndex, pos));
             end
-            handleArray(end).setColor('r');
-            wait(handleArray(end));
             
+            % Idle till the user double-clicks inside the last red polygon.
+            if ~isempty(lastHandle)
+                lastHandle.setColor('r');
+                wait(lastHandle);
+            end
+            
+            % Add polygons till the figure is closed.
+            while ishandle(hFigure)
+                try
+                    hPolygon = impoly('Closed', true);
+                    coordinateList.add(wait(hPolygon)); % Get coordinates.
+                    % This is java indexing starting from 0.
+                    currentIndex = coordinateList.size-1;
+                    % Update changes in the polygon using a listener.
+                    addNewPositionCallback(hPolygon, ...
+                        @(pos) coordinateList.set(currentIndex, pos));
+                catch
+                end
+            end
+            
+            % Add valid polygons to polygonCell.
+            itr = coordinateList.iterator;
             polygonCell = {};
-            for handle = handleArray
-                if ~isempty(handle.getPosition())
-                    position = handle.getPosition();
-                    % Close the polygon.
+            while itr.hasNext()
+                position = itr.next();
+               
+                if ~isempty(position)
+                    if size(position, 1) < 3
+                        warning('Skipping a polygon. Too few points.');
+                        continue;
+                    end
+                    
+                    % Make the polygon closed.
                     position = [ position; position(1,:)];
+                    
                     polygonCell{end+1} = position;
                 end
             end
             
+            % Set the new coordinates in the model.
             obj.polygonCell = polygonCell;
-            
-            close(f);
         end
         
         
