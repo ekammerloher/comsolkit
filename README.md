@@ -3,14 +3,17 @@ Wrapper around the LiveLink™ for MATLAB® Interface of COMSOL Multiphysics®, 
 
 # Requirements
 - (optinal, for gds-import) Configured https://github.com/ulfgri/gdsii-toolbox (requires mex-file compilation, ask me)
-- COMSOL Multiphysics® LiveLink™ for MATLAB® (tested with Version 5.0)
+- COMSOL Multiphysics® LiveLink™ for MATLAB® (tested with Version **5.0**)
+- at least MATLAB® **2014b**
 
 # Installation
 1. Clone the repository or download and extract the zip-file version.
 2. Rename `comsolkit/` to `+comsolkit/` and put the parent folder on the Matlab PATH (this is a Matlab package).
 3. From the gdsii-toolbox put only the `Basic/` folder (with subfolders) on the Matlab PATH (rest of the toolbox is not required).
+4. Enshure Comsol LiveLink files are on the Matlab path (`installdir/COMSOL/COMSOLxx/Multiphysics/mli`)
 
 # Usage
+- ensure a Comsol server is running (`comsolmphserver.exe` locally or a remote server, see `help comsolkit.GateLayoutModel.server_connect` for connection options)
 - comsolkit syncs changes both ways. Change features in Comsol or properties in Matlab, it will stay in sync
 - Check out the [workflow.m](workflow.m) script. It contains one possible workflow.
 - All classes, constructors and methods are fully documented. Try `help <functionname>` to understand their behaviour
