@@ -60,19 +60,19 @@ gl.layerArray(1).polygonCell{1} = (coords.*1.1) .+ 1; % Scale and translate the 
 
 %% Obtain a rasterized interpolated potential.
 precision = 10;
-l_domain = str2double(gl1.get_param('l_domain'));
-w_domain = str2double(gl1.get_param('w_domain'));
-origin_x = str2double(gl1.get_param('origin_x'));
-origin_y = str2double(gl1.get_param('origin_y'));
+l_domain = str2double(gl.get_param('l_domain'));
+w_domain = str2double(gl.get_param('w_domain'));
+origin_x = str2double(gl.get_param('origin_x'));
+origin_y = str2double(gl.get_param('origin_y'));
 x0 = origin_x:precision:l_domain+origin_x;
 y0 = origin_y:precision:w_domain+origin_y;
-z0 = str2double(gl1.get_param('t_2DEG'));
+z0 = str2double(gl.get_param('t_2DEG'));
 [x,y,z] = meshgrid(x0,y0,z0);
 xyz = [x(:),y(:),z(:)]'; % This is now a 3 x n of points to evaluate.
 
 %% Model is solved and values are returned at interpolated coordinates.
 tic;
-pot = gl1.compute_interpolated_potential(xyz, length(y0), length(x0)); % length(x0), length(y0) are used to reshape the results. Can be omitted.
+pot = gl.compute_interpolated_potential(xyz, length(y0), length(x0)); % length(x0), length(y0) are used to reshape the results. Can be omitted.
 toc;
 
 %% Mesh detail, can range from 1-9, where one is fine.
@@ -89,7 +89,7 @@ colorbar();
 set(gca,'YDir','normal');
 
 %% Overlay gates.
-gl1.layerArray.plot('Names', 'on');
+gl.layerArray.plot('Names', 'on');
 
 %% Get unit 1 potentials for all gates ans save them to pots array.
 gl.set_param('charge_density', 0); % Otherwise this will not make sense.
