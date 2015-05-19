@@ -9,6 +9,9 @@ classdef ComsolModel < handle % All copies are references to same object
         tag % Tag of the model object.
         geom % Maintain a handle to the first geometry object
     end
+    properties
+        comsolVersion % Track version, since some methods change from 4.4 to 5.
+    end
     properties(Constant)
         % Conversion of unit string in comsol to a value in meters.
         UNIT = {{'nm',1e-9}, ...
@@ -108,6 +111,7 @@ classdef ComsolModel < handle % All copies are references to same object
             end
             
             obj.model.hist.disable; % Explicitly disable undo history.
+            obj.comsolVersion = obj.model.getComsolVersion();
         end
         
         
@@ -351,6 +355,11 @@ classdef ComsolModel < handle % All copies are references to same object
             %  plot(obj, varargin)
             
             mphgeom(obj.model, obj.geom.tag(), 'facealpha', 0.5);
+        end
+
+
+        function str = label(obj, feature, newLabel)
+            str = '';
         end
             
     end

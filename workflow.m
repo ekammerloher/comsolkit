@@ -33,8 +33,8 @@ gl.set_param('origin_y', 23420.449309);
 gl.set_param('l_domain', 2538.594470);
 gl.set_param('w_domain', 1078.341014);
 
-%% Enable surface charge density of 2DEG for sreening.
-chargeDensity = -1.60217657e-19 * 1e15; % WARNING: Superposition of potentials Phi_i per gate i does not work with this.
+%% Enable surface charge density of 2DEG.
+chargeDensity = -1.60217657e-19 * 1e15;
 gl.set_param('charge_density', chargeDensity);
 
 %% Model 3D view.

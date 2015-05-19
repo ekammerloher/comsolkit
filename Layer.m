@@ -173,10 +173,10 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            layerName = char(obj.extrude.label());
+            layerName = char(obj.extrude.name());
             
             % Ensure the same name is set for the workplane.
-            obj.workPlane.label([obj.WORKPLANE_NAME_PREFIX layerName]);
+            obj.workPlane.name([obj.WORKPLANE_NAME_PREFIX layerName]);
         end
         
         
@@ -187,8 +187,8 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             assert(ischar(newName) && ~isempty(newName), ...
                 'The new name %s is not valid.', newName);
             
-            obj.extrude.label(newName);
-            obj.workPlane.label([obj.WORKPLANE_NAME_PREFIX newName]);
+            obj.extrude.name(newName);
+            obj.workPlane.name([obj.WORKPLANE_NAME_PREFIX newName]);
         end
         
         

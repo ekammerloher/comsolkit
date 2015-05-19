@@ -55,7 +55,7 @@ classdef Gate < comsolkit.Layer
                                 obj.potentialTag, 'ElectricPotential', 2);
                             
                 potential.selection.named(obj.boundaryTag);
-                potential.label(obj.name);
+                potential.name(obj.name);
             end
             
             obj.voltage = p.Results.Voltage;
@@ -75,7 +75,7 @@ classdef Gate < comsolkit.Layer
                    obj.hModel.es.tag(), obj.potentialTag); 
                
             potential = obj.hModel.es.feature(obj.potentialTag);
-            potential.label(obj.name);
+            potential.name(obj.name);
         end
         
         
@@ -106,7 +106,7 @@ classdef Gate < comsolkit.Layer
                                obj.floatingTag, 'FloatingPotential', 2);
                             
                     floating.selection.named(obj.boundaryTag);
-                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
                 else
                     hasFloating = obj.hModel.es.feature().index( ...
                                     obj.floatingTag);
@@ -116,7 +116,7 @@ classdef Gate < comsolkit.Layer
                
                     floating = obj.hModel.es.feature(obj.floatingTag);
                     floating.active(true);
-                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
                 end
                                         
                                     
@@ -131,7 +131,7 @@ classdef Gate < comsolkit.Layer
 
                     floating = obj.hModel.es.feature(obj.floatingTag);
                     floating.active(false);
-                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
                 end
             end
         end
