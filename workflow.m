@@ -99,7 +99,6 @@ set(gca,'YDir','normal');
 gl.layerArray.plot('Names', 'on');
 
 %% Get unit 1 potentials for all gates ans save them to pots array.
-gl.set_param('charge_density', 0); % Otherwise this will not make sense.
 
 pots = zeros(length(y0), length(x0), ...
     length(gl.layerArray)); % prepare array for results
