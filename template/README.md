@@ -60,6 +60,9 @@ A simple two block template, suspended in a infinite elements elepsoid.
       <------l_domain----->
 ```
 
+### template_GaAs_basic_comsol44.mph
+Same as `template_GaAs.mph` but can be opened with comsol 4.4. It does not contain an infinite elements ellipsoid surrounding the two blocks.
+
 ### Create template from scratch
 It is possible to create a template just with LiveLink commands. The code below will recreate `template_GaAs.mph` (but without an infinite elements ellipsoid surrounding the two blocks).
 
