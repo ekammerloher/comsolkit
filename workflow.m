@@ -59,9 +59,8 @@ coords = gl.layerArray(1).polygonCell{1};
 gl.layerArray(1).polygonCell{1} = (coords.*1.1) .+ 1; % Scale and translate the whole polygon a bit.
 
 %% Edit/create a gate by mouse.
-gl.add_layer(gl.layerArray(1).polygonCell); % Will create a new gate with the same XY coordinates as Gate 1.
+gl.add_layer(gl.layerArray(1).polygonCell, 'Screening', gl.DEFAULT_GATE_CLASS); % Will create a new gate with the same XY coordinates as Gate 1.
 gl.layerArray(end).edit_polygon_cell(); % Edit the vertices, add new polygons. Can be used to make a screening layer to simulate the free 2DEG.
-gl.layerArray(end).name = 'Screening';
 gl.layerArray(end).distance = 10; % Increase thickness from default 1 to simplify mesh and reduce computation time.
 gl.layerArray(end).zPosition = str2double(gl.get_param('t_2DEG')) - gl.layerArray(end).distance; % Put it in contact with 2DEG from below.
 
