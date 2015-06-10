@@ -124,14 +124,8 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             obj.std.run; % Solve the model.
             
             % Retrieve interpolated potential values.
-            potential = mphinterp(obj.model, obj.DEFAULT_POT_VAR, ...
-                                  'coord', coordinateArray);
-                              
-            if nargin == 4
-                mRows = varargin{1};
-                nColms = varargin{2};
-                potential = reshape(potential, mRows, nColms);
-            end
+            potential = evaluate_interpolated_expression(obj, ...
+                obj.DEFAULT_POT_VAR, 'coord', coordinateArray, varargin);
         end
                  
         
