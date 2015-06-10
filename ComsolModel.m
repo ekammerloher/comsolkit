@@ -358,11 +358,6 @@ classdef ComsolModel < handle % All copies are references to same object
         end
 
 
-        function str = label(obj, feature, newLabel)
-            str = '';
-        end
-        
-        
         function data = evaluate_interpolated_expression(obj, expr, ...
                         	coordinateArray, varargin)
             % evaluate_interpolated_expression Evaluates expression.
