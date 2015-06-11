@@ -125,7 +125,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             
             % Retrieve interpolated potential values.
             potential = evaluate_interpolated_expression(obj, ...
-                obj.DEFAULT_POT_VAR, 'coord', coordinateArray, varargin);
+                obj.DEFAULT_POT_VAR, coordinateArray, varargin);
         end
                  
         
