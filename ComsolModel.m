@@ -395,8 +395,6 @@ classdef ComsolModel < handle % All copies are references to same object
                    size(coordinateArray, 1) == 3, ...
                    'Wrong coordinateArray format');
             
-            obj.std.run; % Solve the model.
-            
             % Retrieve interpolated potential values.
             try
                 data = mphinterp(obj.model, expr, ...
