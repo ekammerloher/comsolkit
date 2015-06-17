@@ -400,13 +400,13 @@ classdef ComsolModel < handle % All copies are references to same object
                 data = mphinterp(obj.model, expr, ...
                                       'coord', coordinateArray);
             catch
-                warning(['Was unable to evaluate expression on domain. '
+                warning(['Was unable to evaluate expression on domain. '...
                          'Will try edim=boundary now.']);
                 data = mphinterp(obj.model, expr, 'edim', 'boundary', ...
                                       'coord', coordinateArray);
             end
                               
-            if nargin == 4
+            if nargin == 5
                 mRows = varargin{1};
                 nColms = varargin{2};
                 data = reshape(data, mRows, nColms);

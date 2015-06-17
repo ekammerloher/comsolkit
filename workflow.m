@@ -89,6 +89,7 @@ mphmesh(gl.model, 'mesh1', 'Facealpha', 0.5); % Plot model mesh.
 gl.model.mesh('mesh1').feature('size').set('hauto', 2);
 
 %% Plot the potential.
+
 imagesc(x0,y0,pot);
 colormap(parula(512));
 colorbar();
