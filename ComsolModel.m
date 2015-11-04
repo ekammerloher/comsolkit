@@ -358,9 +358,62 @@ classdef ComsolModel < handle % All copies are references to same object
         end
 
 
-        function str = label(obj, feature, newLabel)
-            str = '';
+        function data = evaluate_interpolated_expression(obj, expr, ...
+                        	coordinateArray, varargin)
+            % evaluate_interpolated_expression Evaluates expression.
+            %
+            %  data = evaluate_interpolated_expression(obj, expr, ...
+            %                    coordinateArray)
+            %  data = evaluate_interpolated_expression(obj, expr, ...
+            %                    coordinateArray, mRows, nColms)
+            %
+            %  Parameters:
+            %  coordinateArray: Expression is evaluated at this points,
+            %                   when they do not correspond to mesh
+            %                   vertices, values are interpolated
+            %                   (3 x n size).
+            %  expr: Expression to evaluate (e.g. 'mod1.V', 'es.nD')
+            %  mRows, nColms: Reshape the data, when on a grid (optional).
+            %
+            %  Example:
+            %   precision = 10;
+            %   l_domain = 3000;
+            %   w_domain = 1200;
+            %   x0 = 0:precision:l_domain;
+            %   y0 = 0:precision:w_domain;
+            %   z0 = [-100]; % Depth.
+            %   [x,y,z] = meshgrid(x0,y0,z0);
+            %   xyz = [x(:),y(:),z(:)]';
+            %   pot = evaluate_interpolated_expression(xyz, 'mod1.V', ...
+            %           length(x0), length(y0));
+            
+            import com.comsol.model.*;
+            
+            assert(nargin == 3 || nargin == 5, ...
+                   'Wrong number of arguments');
+            assert(isnumeric(coordinateArray) && ...
+                   size(coordinateArray, 1) == 3, ...
+                   'Wrong coordinateArray format');
+            
+            % Retrieve interpolated potential values.
+            try
+                data = mphinterp(obj.model, expr, ...
+                                      'coord', coordinateArray);
+            catch
+                warning(['Was unable to evaluate expression on domain. '...
+                         'Will try edim=boundary now.']);
+                data = mphinterp(obj.model, expr, 'edim', 'boundary', ...
+                                      'coord', coordinateArray);
+            end
+                              
+            if nargin == 5
+                mRows = varargin{1};
+                nColms = varargin{2};
+                data = reshape(data, mRows, nColms);
+            end
         end
+                
+        
             
     end
     methods(Static)
