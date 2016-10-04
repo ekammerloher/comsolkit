@@ -331,7 +331,13 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %  polygons. Close the figure to finish.
             
             hFigure = figure();
-            
+           
+            % Add breakpoint above to include possible gate design picture.
+            % -----> Include Picture with commented command below<-----------------
+            % hold on;
+            % pic=imread('Z:\Simulation\Analysis\2016-06-23_DoubleDot_tuning\DoseTestEdges.jpeg');
+            % imagesc(pic);
+
             % API: https://docs.oracle.com/javase/7/docs/ ...
             % api/java/util/LinkedList.html
             coordinateList = java.util.LinkedList(); % Jave linked list.
@@ -344,6 +350,9 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             % Retrive existing polygon coordinates.
             polygonCell = obj.polygonCell;
+            
+            %----> Hold here to insert picture of gate design <-------
+            
             
             % Maintain a handle to the last polygon created.
             lastHandle = impoly.empty();
@@ -559,7 +568,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
 
                                     plot(coordinates(:,1), ...
                                          coordinates(:,2), ...
-                                         'red', p.Unmatched);
+                                         'red', p.Unmatched);% changed color
 
                                     if strcmp(p.Results.Names, 'on')
                                         meanCoord = mean(coordinates, 1);
