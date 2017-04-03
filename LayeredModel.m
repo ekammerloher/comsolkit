@@ -104,13 +104,18 @@ classdef LayeredModel < comsolkit.ComsolModel
                 end
                 
                 for coordinateArray = coordinateArrayCell
-                    % For elem = cell pattern: elem 1x1 cell, use elem{1}.
-                    obj.layerArray(end).add_poly(coordinateArray{1});
+                    % Compare object classes.
+                    if strcmp('comsolkit.Charge',char(varargin{2}))
+                        % For elem = cell pattern: elem 1x1 cell, use elem{1}.
+                        obj.layerArray(end).add_point(coordinateArray{1});
+                    else
+                        % For elem = cell pattern: elem 1x1 cell, use elem{1}.                        
+                        obj.layerArray(end).add_poly(coordinateArray{1});                        
+                    end
                 end
             end
             stopIndex = length(obj.layerArray);
-        end
-        
+        end       
         
         function index = add_layer(obj, coordinateArrayCell, varargin)
             % add_layer Creates one layer with polygons.
@@ -149,6 +154,10 @@ classdef LayeredModel < comsolkit.ComsolModel
                                                 varargin{2:end});
                 end
             end
+            
+            
+            
+            
         end
         
         

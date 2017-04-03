@@ -2,7 +2,7 @@ classdef Gate < comsolkit.Layer
     % Gate extends layer with electric potential functionality.
     
     properties(Dependent)
-        voltage % Voltage applied to the gate.
+        voltage   % Voltage applied to the gate.
         potential % Handle to the electric potential feature of Gate.
     end
     properties(Constant)
@@ -12,7 +12,7 @@ classdef Gate < comsolkit.Layer
     end
     properties(Access=private)
         potentialTag % Tag to the electrostatic potential of the gate.
-        floatingTag % Tag to the floating potential of the gate.
+        floatingTag  % Tag to the floating potential of the gate.
     end
     
     methods
@@ -58,7 +58,7 @@ classdef Gate < comsolkit.Layer
                 potential.name(obj.name);
             end
             
-            obj.voltage = p.Results.Voltage;
+           obj.voltage = p.Results.Voltage;
             
             % Used to introduce floating potentials when voltage = NaN.
             obj.floatingTag = '';
@@ -84,8 +84,7 @@ classdef Gate < comsolkit.Layer
             import com.comsol.model.*;
             
             voltage = str2double(obj.potential.getString('V0'));
-        end
-        
+        end             
         
         function obj = set.voltage(obj, newVoltage)
             

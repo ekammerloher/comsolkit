@@ -10,6 +10,7 @@ classdef GateLayoutModel < comsolkit.LayeredModel
         BASE_TAG_STD = 'std'; % Tag of the study feature.
         BASE_TAG_STAT = 'stat'; % Tag of the stationary feature.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
+        DEFAULT_CHARGE_CLASS = @comsolkit.Charge; % Used for import functions.
         DEFAULT_POT_VAR = 'mod1.V'; % Evaluate this for the potential.
     end
     

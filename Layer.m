@@ -11,12 +11,14 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         extrude % Handle to the extrude feature of Layer.
         boundaryTag % Tag of the extrude boundary selection.
         domainTag % Tag of the extrude boundary selection.
+        pointTag % Tag of the point
         polygonCell % Cell containing nx2 arrays of polygons (if any).
     end
     properties(Constant)
         BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
         BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext string for uniquetag.
         BASE_TAG_POLY = 'dyn_poly'; % Base poly string for uniquetag.
+        BASE_TAG_POINT = 'dyn_point'; % Base poly string for uniquetag.
         WORKPLANE_NAME_PREFIX = 'wp_'; % Prefix of workplane label.
     end
     properties(Access=protected)
@@ -168,6 +170,23 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             domainTag = [char(obj.hModel.geom.tag()) '_' domainTag];
         end
     
+        function pointTag = get.pointTag(obj)
+            
+            import com.comsol.model.*;
+            
+            selectionCell = cell(obj.extrude.outputSelection());
+            
+            % Assume we are interested in domains. Their selection name
+            % is the last element.
+            pointTag = selectionCell{end-3};
+            
+            % Not so nice way to access selection from model.selection.
+            % Since geometry selections seperate levels with dots.
+            pointTag = strrep(pointTag, '.', '_');
+            
+            % <gtag>_<trimmedseltag>_<lvl>
+            pointTag = [char(obj.hModel.geom.tag()) '_' pointTag];
+         end
         
         function layerName = get.name(obj)
             
@@ -454,6 +473,27 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
             poly.set('source', 'table');
             poly.set('table', coordinateArray);
+        end
+        
+        
+        function pointTag = add_point(obj, coordinateArray)
+            % add_point Adds a point at the position defined by an n x 3 array.
+            %
+            %  pointTag = add_point(obj, coordinateArray)
+            
+            import com.comsol.model.*;
+            
+            assert(isnumeric(coordinateArray) && ...
+                   size(coordinateArray, 2) == 2 && ...
+                   ~isempty(coordinateArray), ...
+                   'Coordinates are not valid.');
+               
+            
+            pointTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                obj.BASE_TAG_POINT));
+            point = obj.workPlane.geom.feature.create(pointTag, 'Point');
+            point.set('p',coordinateArray(1:2));
+
         end
         
         
