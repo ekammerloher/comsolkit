@@ -7,11 +7,13 @@ classdef GateLayoutModel < comsolkit.LayeredModel
     end
     properties(Constant)
         BASE_TAG_ES = 'es'; % Tag of the electrostatic physics feature.
-        BASE_TAG_STD = 'std'; % Tag of the study feature.
         BASE_TAG_STAT = 'stat'; % Tag of the stationary feature.
         DEFAULT_GATE_CLASS = @comsolkit.Gate; % Used for import functions.
         DEFAULT_CHARGE_CLASS = @comsolkit.Charge; % Used for import functions.
         DEFAULT_POT_VAR = 'mod1.V'; % Evaluate this for the potential.
+    end
+    properties
+        baseTagStd = 'std'; % Tag of the study feature.        
     end
     
     methods
@@ -38,13 +40,13 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             end
             
             % Create stationary study, if it does not exist.
-            stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
+            stdIndex = obj.model.study.index(obj.baseTagStd);
             
             if stdIndex < 0
-                study = obj.model.study.create(obj.BASE_TAG_STD);
+                study = obj.model.study.create(obj.baseTagStd);
                 study.feature.create(obj.BASE_TAG_STAT, 'Stationary');
             else
-                study = obj.model.study(obj.BASE_TAG_STD);
+                study = obj.model.study(obj.baseTagStd);
                 statIndex = study.feature().index(obj.BASE_TAG_STAT);
                 assert(statIndex >= 0, ...
                        'No stationary study feature found.');
@@ -69,12 +71,12 @@ classdef GateLayoutModel < comsolkit.LayeredModel
             
             import com.comsol.model.*;
             
-            stdIndex = obj.model.study.index(obj.BASE_TAG_STD);
+            stdIndex = obj.model.study.index(obj.baseTagStd);
             
             assert(stdIndex >= 0, 'Could not find study %s.', ...
-                   obj.BASE_TAG_STD);
+                   obj.baseTagStd);
                
-            std = obj.model.study(obj.BASE_TAG_STD);
+            std = obj.model.study(obj.baseTagStd);
         end
         
         
