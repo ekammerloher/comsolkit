@@ -263,8 +263,12 @@ classdef ComsolModel < handle % All copies are references to same object
                 fid = fopen(tmpFile,'rb');
                 obj.mphFile = fread(fid, '*uint8');
                 fclose(fid);
-
-                delete(tmpFile); % Clean up.
+                
+                try
+                    delete(tmpFile); % Clean up.
+                catch
+                    % File was automatically deleted.
+                end
             else
                 warning('Could not save comsol object.');
             end
@@ -400,8 +404,8 @@ classdef ComsolModel < handle % All copies are references to same object
                 data = mphinterp(obj.model, expr, ...
                                       'coord', coordinateArray);
             catch
-                warning(['Was unable to evaluate expression on domain. '...
-                         'Will try edim=boundary now.']);
+                %warning(['Was unable to evaluate expression on domain. '...
+                %         'Will try edim=boundary now.']);
                 data = mphinterp(obj.model, expr, 'edim', 'boundary', ...
                                       'coord', coordinateArray);
             end
