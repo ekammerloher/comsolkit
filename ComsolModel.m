@@ -441,7 +441,11 @@ classdef ComsolModel < handle % All copies are references to same object
                 modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                 obj.model = ModelUtil.load(modelTag, tmpFile);
                 
-                delete(tmpFile); % Clean up.
+                try
+                    delete(tmpFile); % Clean up.
+                catch
+                    % File was automatically deleted.
+                end
                 obj.mphFile = [];
             else
                 warning('Could not create model object.');
