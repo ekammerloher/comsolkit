@@ -264,10 +264,9 @@ classdef ComsolModel < handle % All copies are references to same object
                 obj.mphFile = fread(fid, '*uint8');
                 fclose(fid);
                 
-                try
-                    delete(tmpFile); % Clean up.
-                catch
-                    % File was automatically deleted.
+                % Check if file was automatically deleted.
+                if exist(tmpFile, 'file')==2
+                  delete(tmpFile); % Clean up.
                 end
             else
                 warning('Could not save comsol object.');
@@ -441,11 +440,11 @@ classdef ComsolModel < handle % All copies are references to same object
                 modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                 obj.model = ModelUtil.load(modelTag, tmpFile);
                 
-                try
-                    delete(tmpFile); % Clean up.
-                catch
-                    % File was automatically deleted.
+                % Check if file was automatically deleted.
+                if exist(tmpFile, 'file')==2
+                  delete(tmpFile); % Clean up.
                 end
+               
                 obj.mphFile = [];
             else
                 warning('Could not create model object.');
