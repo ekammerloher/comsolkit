@@ -28,7 +28,7 @@ classdef Gate < comsolkit.Layer
             %  Distance: Distance of layer. Can be monotonous array 
             %            (must be non-zero, pos/neg, default: 1)
             %  zPosition: z-Position of the layer (default: 0)
-            %  Voltage: Voltage of the gate (default: 0)
+            %  Voltage: Voltage of the gate. Can be parameter. (default: 0)
             %  %%% when creating from existing extruded workplane/pot. %%%
             %  FromExtrudeTag: Tag of an existing extrude feature
             %  FromPotentialTag: Tag of an existing electric potential
