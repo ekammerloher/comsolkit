@@ -70,7 +70,6 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 % Setup extrude. Will use previous workplane automatically.
                 extrude = hModel.geom.feature().create(obj.extrudeTag, ...
                                                        'Extrude');
-                extrude.set('createselection', 'on');
                 extrude.selection('input').set(obj.workPlaneTag);
                 
             else % Check extrude feature, when constructing from a tag.
@@ -155,12 +154,16 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             import com.comsol.model.*;
             
             if obj.extrude.isActive() % Check if non-zero thickness layer.
+                obj.extrude.set('createselection', 'on');
+                obj.workPlane.set('createselection', 'off');
                 selectionCell = cell(obj.extrude.outputSelection());
             
                 % Assume we are interested in boundaries. Their selection
                 % name is the last element - 1.
                 boundaryTag = selectionCell{end-1};
             else
+                obj.extrude.set('createselection', 'off');
+                obj.workPlane.set('createselection', 'on');
                 selectionCell = cell(obj.workPlane.outputSelection());
                 % For workplane bnd is the last element.
                 boundaryTag = selectionCell{end};
