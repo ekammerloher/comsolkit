@@ -58,10 +58,16 @@ classdef Gate < comsolkit.Layer
                 potential.name(obj.name);
             end
             
-            obj.voltage = p.Results.Voltage;
-            
             % Used to introduce floating potentials when voltage = NaN.
             obj.floatingTag = '';
+            
+            try
+                obj.voltage = p.Results.Voltage;
+            catch ME
+                warning('Error caugt. Clear gate features and rethrow.');
+                obj.delete()
+                rethrow(ME);
+            end
         end
         
         
@@ -146,13 +152,18 @@ classdef Gate < comsolkit.Layer
             %
             %  delete(obj)
             
-            delete@comsolkit.Layer(obj);
             try
                 obj.hModel.es.feature().remove(obj.potentialTag);
+                if ~isempty(obj.floatingTag)
+                    obj.hModel.es.feature().remove(obj.floatingTag);
+                end
+                    
             catch
                 warning('Could not remove Potential %s from server.', ...
                         obj.potentialTag);
             end
+            
+            delete@comsolkit.Layer(obj);
         end
         
         

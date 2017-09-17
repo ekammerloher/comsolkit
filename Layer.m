@@ -21,6 +21,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
     end
     properties(Access=protected)
         extrudeTag % Tag to the extrude feature of the layer.
+        workPlaneTag % Tag to the workplane feature of the layer.
         hModel % Handle to a ComsolModel object or a derived object.
     end
     
@@ -56,13 +57,13 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             p.parse(varargin{:});
             
             if isempty(p.Results.FromExtrudeTag)
-                workPlaneTag = char(hModel.geom.feature().uniquetag( ...
+                obj.workPlaneTag = char(hModel.geom.feature().uniquetag( ...
                     obj.BASE_TAG_WORKPLANE));
                 obj.extrudeTag = char(hModel.geom.feature().uniquetag( ...
                     obj.BASE_TAG_EXTRUDE));
                 
                 % Setup workplane.
-                workPlane = hModel.geom.feature().create(workPlaneTag, ...
+                workPlane = hModel.geom.feature().create(obj.workPlaneTag, ...
                                                          'WorkPlane');
                 workPlane.set('quickplane', 'xy');
                 
@@ -70,7 +71,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 extrude = hModel.geom.feature().create(obj.extrudeTag, ...
                                                        'Extrude');
                 extrude.set('createselection', 'on');
-                extrude.selection('input').set(workPlaneTag);
+                extrude.selection('input').set(obj.workPlaneTag);
                 
             else % Check extrude feature, when constructing from a tag.
                 obj.extrudeTag = p.Results.FromExtrudeTag;
@@ -83,14 +84,20 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                                'workplane and not a face.']);
             end
             
-            % Use setters to assign extrude feature and workplane
-            % properties.
-            obj.zPosition = p.Results.zPosition;
-            obj.distance = p.Results.Distance;
-                
-            % Set common name, if provided. Use setter.
-            if ~isempty(p.Results.Name)
-                obj.name = p.Results.Name;
+            try
+                % Use setters to assign extrude feature and workplane
+                % properties.
+                obj.zPosition = p.Results.zPosition;
+                obj.distance = p.Results.Distance;
+
+                % Set common name, if provided. Use setter.
+                if ~isempty(p.Results.Name)
+                    obj.name = p.Results.Name;
+                end
+            catch ME
+                warning('Error caugt. Clear layer features and rethrow.');
+                obj.delete()
+                rethrow(ME);
             end
         end
         
@@ -113,23 +120,15 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         function workPlane = get.workPlane(obj)
             
             import com.comsol.model.*;
-            
-            % The extrude feature could have multiple workplanes as inputs.
-            % Just assume one for our usecase.
-            inputObjectCell = cell( ...
-                obj.extrude.selection('input').objects());
-            
-            assert(isscalar(inputObjectCell), ...
-                   ['Layer expects one workplane for the extrude ' ...
-                    'feature. Found %d.'], length(inputObjectCell));
-                            
+                           
             workplaneIndex = ...
-                obj.hModel.geom.feature().index(inputObjectCell{1});
+                obj.hModel.geom.feature().index(obj.workPlaneTag);
             
+            % Is -1 when not in list.
             assert(workplaneIndex >= 0, 'Could not find workplane %s.', ...
-                   inputObjectCell{1});
+                   obj.workPlaneTag);
             
-            workPlane = obj.hModel.geom.feature(inputObjectCell{1});
+            workPlane = obj.hModel.geom.feature(obj.workPlaneTag);
         end
         
         
@@ -437,15 +436,18 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %  delete(obj)
             
             import com.comsol.model.*;
-            
             try
-                workplaneTag = obj.workPlane.tag();
                 obj.hModel.geom.feature().remove(obj.extrudeTag);
-                obj.hModel.geom.feature().remove(workplaneTag);
             catch
-                warning('Could not remove Layer %s from server.', ...
+                warning('Could not remove Layer %s Ext. from server.', ...
                         obj.extrudeTag);
             end
+            try
+                obj.hModel.geom.feature().remove(obj.workPlaneTag);
+            catch
+                warning('Could not remove Layer %s Wrp. from server.', ...
+                        obj.workPlaneTag);
+            end                
         end
         
         
