@@ -71,6 +71,18 @@ classdef Gate < comsolkit.Layer
         end
         
         
+        function update_selection(obj)
+            if isnan(obj.voltage)
+                if ~isempty(obj.floatingTag)
+                    floating = obj.hModel.es.feature(obj.floatingTag);
+                    floating.selection.named(obj.boundaryTag);
+                end
+            else
+                obj.potential.selection.named(obj.boundaryTag);
+            end
+        end
+        
+            
         function potential = get.potential(obj)
             
             import com.comsol.model.*;

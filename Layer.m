@@ -5,8 +5,8 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
     
     properties(Dependent)
         name % Common name of the workplane and the extrude feature.
-        distance % The extrude distance from zPosition.
         zPosition % z-Position of the layer in the model.
+        distance % The extrude distance from zPosition.
         workPlane % Handle to the workplane feature of Layer.
         extrude % Handle to the extrude feature of Layer.
         boundaryTag % Tag of the extrude boundary selection.
@@ -102,6 +102,13 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         end
         
         
+        function update_selection(obj)
+            % update_selection This is called when the distance property is
+            % updated. Overload to update the selection to workplane or
+            % extrude feature.
+        end
+        
+        
         function extrude = get.extrude(obj)
             
             import com.comsol.model.*;
@@ -120,6 +127,17 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         function workPlane = get.workPlane(obj)
             
             import com.comsol.model.*;
+            
+            if isempty(obj.workPlaneTag) % Legacy code.
+                % The extrude feature could have multiple workplanes.
+                inputObjectCell = cell( ... 
+                    obj.extrude.selection('input').objects());
+                
+                 assert(isscalar(inputObjectCell), ... 
+                        ['Layer expects one workplane for the extrude ' ...
+                        'feature. Found %d.'], length(inputObjectCell));
+                    obj.workPlaneTag = inputObjectCell{1};
+            end
                            
             workplaneIndex = ...
                 obj.hModel.geom.feature().index(obj.workPlaneTag);
@@ -229,6 +247,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             else % Layer has zero thickness.
                 obj.extrude.active(false);
             end
+            obj.update_selection();
         end
         
         
