@@ -121,7 +121,7 @@ classdef Gate < comsolkit.Layer
             
             obj.potential.set('V0', newVoltage);
             
-            if isnan(newVoltage)
+            if all(isnan(newVoltage))
                 obj.potential.active(false);
                 if isempty(obj.floatingTag)
                     obj.floatingTag = ...
