@@ -34,8 +34,10 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             %  Parameters:
             %  hModel: Required handle to parent ComsolModel type object
             %  Name: Common name of workpane and the extrude feature.
-            %  Distance: Distance of layer. Can be monotonous array 
-            %            (must be non-zero, pos/neg, default: 1)
+            %  Distance: Thickness of layer. Can be monotonous array or
+            %            scalar, pos/neg. If zero the extrude feature is 
+            %            deactivated and the workplane is used as a zero 
+            %            thickness layer, default: 1)
             %  zPosition: z-Position of the layer (default: 0)
             %  %%% when creating from existing extruded workplane %%%
             %  FromExtrudeTag: Tag of an existing extrude feature
@@ -135,11 +137,17 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            selectionCell = cell(obj.extrude.outputSelection());
+            if obj.extrude.isActive() % Check if non-zero thickness layer.
+                selectionCell = cell(obj.extrude.outputSelection());
             
-            % Assume we are interested in boundaries. Their selection name
-            % is the last element - 1.
-            boundaryTag = selectionCell{end-1};
+                % Assume we are interested in boundaries. Their selection
+                % name is the last element - 1.
+                boundaryTag = selectionCell{end-1};
+            else
+                selectionCell = cell(obj.workPlane.outputSelection());
+                % For workplane bnd is the last element.
+                boundaryTag = selectionCell{end};
+            end
             
             % Not so nice way to access selection from model.selection.
             % Since geometry selections seperate levels with dots.
@@ -154,18 +162,23 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            selectionCell = cell(obj.extrude.outputSelection());
-            
-            % Assume we are interested in domains. Their selection name
-            % is the last element.
-            domainTag = selectionCell{end};
-            
-            % Not so nice way to access selection from model.selection.
-            % Since geometry selections seperate levels with dots.
-            domainTag = strrep(domainTag, '.', '_');
-            
-            % <gtag>_<trimmedseltag>_<lvl>
-            domainTag = [char(obj.hModel.geom.tag()) '_' domainTag];
+            if obj.extrude.isActive() % Check if non-zero thickness layer.
+                selectionCell = cell(obj.extrude.outputSelection());
+
+                % Assume we are interested in domains. Their selection name
+                % is the last element.
+                domainTag = selectionCell{end};
+
+                % Not so nice way to access selection from model.selection.
+                % Since geometry selections seperate levels with dots.
+                domainTag = strrep(domainTag, '.', '_');
+
+                % <gtag>_<trimmedseltag>_<lvl>
+                domainTag = [char(obj.hModel.geom.tag()) '_' domainTag];
+            else
+                warning('distance is 0. No domains defined.');
+                domainTag = '';
+            end
         end
     
         
@@ -196,7 +209,11 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            distance = obj.extrude.getDoubleArray('distance');
+            if obj.extrude.isActive() % Check if non-zero thickness layer.
+                distance = obj.extrude.getDoubleArray('distance');
+            else
+                distance = 0;
+            end
         end
         
         
@@ -207,7 +224,12 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             assert(isnumeric(newDistance) && ~isempty(newDistance), ...
                    'The new distance is not valid.');
             
-            obj.extrude.set('distance', newDistance);
+            if all(newDistance ~= 0) % Layer has finite thickness.
+                obj.extrude.active(true);
+                obj.extrude.set('distance', newDistance);
+            else % Layer has zero thickness.
+                obj.extrude.active(false);
+            end
         end
         
         
