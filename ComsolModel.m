@@ -264,10 +264,14 @@ classdef ComsolModel < handle % All copies are references to same object
                 obj.mphFile = fread(fid, '*uint8');
                 fclose(fid);
                 
-                % Check if file was automatically deleted.
-                if exist(tmpFile, 'file')==2
-                  delete(tmpFile); % Clean up.
-                end
+                % Turn recycle off to permanently delete files.
+                prevStateR = recycle('off');
+                % Turn permission warning off, if still open in comosl.
+                prevStateW = warning('off', 'MATLAB:DELETE:Permission');
+                delete(tmpFile)
+                % Restore the states.
+                recycle(prevStateR);
+                warning(prevStateW);
             else
                 warning('Could not save comsol object.');
             end
@@ -440,11 +444,15 @@ classdef ComsolModel < handle % All copies are references to same object
                 modelTag = ModelUtil.uniquetag(obj.BASE_TAG_MODEL);
                 obj.model = ModelUtil.load(modelTag, tmpFile);
                 
-                % Check if file was automatically deleted.
-                if exist(tmpFile, 'file')==2
-                  delete(tmpFile); % Clean up.
-                end
-               
+                % Turn recycle off to permanently delete files.
+                prevStateR = recycle('off');
+                % Turn permission warning off, if still open in comosl.
+                prevStateW = warning('off', 'MATLAB:DELETE:Permission');
+                delete(tmpFile)
+                % Restore the states.
+                recycle(prevStateR);
+                warning(prevStateW);
+                
                 obj.mphFile = [];
             else
                 warning('Could not create model object.');
