@@ -40,7 +40,7 @@ classdef Gate < comsolkit.Layer
             p.KeepUnmatched = true;
             addParameter(p, 'FromPotentialTag', '', @ischar);
             addParameter(p, 'Voltage', 0, ...
-                         @(x) isnumeric(x) && isscalar(x));
+                         @(x) (isnumeric(x) && isscalar(x)) || ischar(x));
             parse(p,varargin{:});
             
             obj = obj@comsolkit.Layer(hModel, p.Unmatched);
@@ -102,7 +102,10 @@ classdef Gate < comsolkit.Layer
             import com.comsol.model.*;
             
             if obj.potential.isActive() % Check if floating potential.
-                voltage = str2double(obj.potential.getString('V0'));
+                voltage = char(obj.potential.getString('V0'));
+                if ~isnan(str2double(voltage))
+                    voltage = str2double(voltage);
+                end
             else
                 voltage = NaN;
             end
@@ -113,7 +116,7 @@ classdef Gate < comsolkit.Layer
             
             import com.comsol.model.*;
             
-            assert(isnumeric(newVoltage) && isscalar(newVoltage), ...
+            assert((isnumeric(newVoltage) && isscalar(newVoltage)) || ischar(newVoltage), ...
                    'New voltage is not valid.');
             
             obj.potential.set('V0', newVoltage);
@@ -185,7 +188,7 @@ classdef Gate < comsolkit.Layer
             %  str = info_string(obj)
             
             str = info_string@comsolkit.Layer(obj);
-            str = sprintf('%s voltage: %f', str, obj.voltage);
+            str = sprintf('%s voltage: %s', str, num2str(obj.voltage));
         end
     end
     methods(Static)
