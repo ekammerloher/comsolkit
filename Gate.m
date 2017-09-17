@@ -83,7 +83,11 @@ classdef Gate < comsolkit.Layer
             
             import com.comsol.model.*;
             
-            voltage = str2double(obj.potential.getString('V0'));
+            if obj.potential.isActive() % Check if floating potential.
+                voltage = str2double(obj.potential.getString('V0'));
+            else
+                voltage = NaN;
+            end
         end
         
         
