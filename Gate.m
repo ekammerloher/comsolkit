@@ -72,13 +72,16 @@ classdef Gate < comsolkit.Layer
         
         
         function update_selection(obj)
-            if isnan(obj.voltage)
-                if ~isempty(obj.floatingTag)
-                    floating = obj.hModel.es.feature(obj.floatingTag);
-                    floating.selection.named(obj.boundaryTag);
+            % Skip this, when constructing the object.
+            if obj.hModel.es.feature().index(obj.potentialTag) >=0
+                if isnan(obj.voltage)
+                    if ~isempty(obj.floatingTag)
+                        floating = obj.hModel.es.feature(obj.floatingTag);
+                        floating.selection.named(obj.boundaryTag);
+                    end
+                else
+                    obj.potential.selection.named(obj.boundaryTag);
                 end
-            else
-                obj.potential.selection.named(obj.boundaryTag);
             end
         end
         
@@ -179,6 +182,16 @@ classdef Gate < comsolkit.Layer
             end
             
             delete@comsolkit.Layer(obj);
+        end
+
+
+        function st = info_struct(obj)
+            % info_struct Generates information struct about the object.
+            %
+            %  st = info_struct(obj)
+
+            st = info_struct@comsolkit.Layer(obj);
+            st.voltage = obj.voltage;
         end
         
         
