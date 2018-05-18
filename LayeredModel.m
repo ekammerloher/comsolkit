@@ -202,6 +202,33 @@ classdef LayeredModel < comsolkit.ComsolModel
         end
         
         
+        function pprint_layer_info(obj)
+            % pprint_layer_info Pretty print layer information.
+            %
+            %  pprint_layer_info(obj)
+            
+            for index = 1:length(obj.layerArray)
+                layer = obj.layerArray(index);
+                stCell{index} = layer.info_struct();
+                stCell{index}.idx = index;
+            end
+
+            uniqueFields = unique(char(cellfun(@(x)char(fieldnames(x)), ...
+                                  stCell, 'UniformOutput',false)),'rows');
+
+            % Fill in missing elements, if any.
+            for k=1:length(stCell)
+                for u=1:size(uniqueFields,1)
+                    fieldName = strtrim(uniqueFields(u,:));
+                    if ~isfield(stCell{k}, fieldName)
+                        stCell{k}.(fieldName) = [];
+                    end
+                end
+            end 
+            disp(struct2table([stCell{:}]));
+        end
+
+
         function print_layer_info(obj)
             % print_layer_info Prints layer information in a table.
             %
