@@ -52,7 +52,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             p.addParameter('FromExtrudeTag', '', @ischar);
             p.addParameter('Distance', 1, @isnumeric);
             p.addParameter('zPosition', 0, ...
-                @(x) isnumeric(x) && isscalar(x));
+                @(x) (isnumeric(x) && isscalar(x)) || ischar(x));
             
             p.parse(varargin{:});
             
@@ -258,7 +258,10 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            zPosition = obj.workPlane.getDouble('quickz');
+            zPosition = char(obj.workPlane.getString('quickz'));
+            if ~isnan(str2double(zPosition))
+                zPosition = str2double(zPosition);
+            end
         end
         
         
@@ -266,7 +269,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             import com.comsol.model.*;
             
-            assert(isnumeric(newPosition) && isscalar(newPosition), ...
+            assert((isnumeric(newPosition) && isscalar(newPosition)) || ischar(newPosition), ...
                    'The new position is not valid.');
             
             obj.workPlane.set('quickz', newPosition);
@@ -503,7 +506,22 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             
             obj.workPlane.geom.feature().clear();
         end
-        
+
+
+        function st = info_struct(obj)
+            % info_struct Generates information struct about the object.
+            %
+            %  st = info_struct(obj)
+            
+            maxDistance = max([obj.distance(:) 0]);
+            minDistance = min([obj.distance(:) 0]);
+
+            st = struct('class', class(obj), ...
+                         'name', obj.name, ...
+                         'zPos', obj.zPosition, ...
+                          'thickness', maxDistance - minDistance);
+        end
+
         
         function str = info_string(obj)
             % info_string Generates information string about the object.
