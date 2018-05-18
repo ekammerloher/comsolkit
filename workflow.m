@@ -65,7 +65,7 @@ gl.layerArray(end).distance = 10; % Increase thickness from default 1 to simplif
 gl.layerArray(end).zPosition = str2double(gl.get_param('t_2DEG')) - gl.layerArray(end).distance; % Put it in contact with 2DEG from below.
 
 %% Obtain a rasterized interpolated potential.
-precision = 10;
+precision = 5;
 l_domain = str2double(gl.get_param('l_domain'));
 w_domain = str2double(gl.get_param('w_domain'));
 origin_x = str2double(gl.get_param('origin_x'));
@@ -89,8 +89,8 @@ mphmesh(gl.model, 'mesh1', 'Facealpha', 0.5); % Plot model mesh.
 gl.model.mesh('mesh1').feature('size').set('hauto', 2);
 
 %% Plot the potential.
-
-imagesc(x0,y0,pot);
+figure(1)
+imagesc(x0,y0,rho);
 colormap(parula(512));
 colorbar();
 set(gca,'YDir','normal');
