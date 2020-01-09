@@ -152,6 +152,27 @@ classdef LayeredModel < comsolkit.ComsolModel
         end
         
         
+        function restore(obj)
+            extrudeTagCell = arrayfun(@(f)char(f.tag), ...
+                                      [obj.layerArray.extrude], ...
+                                      'UniformOutput', false);
+            itr = obj.geom.feature.iterator;
+            while itr.hasNext()
+                feature = itr.next();
+                tagPattern = [comsolkit.Layer.BASE_TAG_EXTRUDE '\d+'];
+                featureTag = char(feature.tag);
+                
+                if ~isempty(regexp(featureTag, tagPattern, 'once'))
+                    if ~any(strcmp(featureTag, extrudeTagCell))
+                        l = comsolkit.Layer(obj, 'FromExtrudeTag', ...
+                                            featureTag);
+                        obj.layerArray(end+1) = l;
+                    end
+                end
+            end
+        end
+        
+        
         function batch_remove_layer(obj, startIndex, stopIndex)
             % batch_remove_layer Remove layers from server and layerArray.
             %

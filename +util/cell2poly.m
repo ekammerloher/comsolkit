@@ -1,0 +1,23 @@
+function polyShape = cell2poly(coordinateCell, scalefactor)
+    % cell2poly Convert coordinateCell to a polyshape array.
+    %
+    %  polyShape = cell2poly(coordinateCell, scalefactor)
+
+    assert(iscell(coordinateCell), 'Input must be a cell.');
+    if nargin < 2
+        scalefactor = 1;
+    end
+    assert(isnumeric(scalefactor) && isscalar(scalefactor), ...
+           'scalefactor must be a scalar number.');
+
+    polyShape = polyshape.empty(numel(coordinateCell), 0);
+    for ii=1:numel(coordinateCell)
+        polyShape(ii) = polyshape(cellfun(@(c) c(:,1).*scalefactor, ...
+                                          coordinateCell{ii}, ...
+                                          'UniformOutput', false), ...
+                                  cellfun(@(c) c(:,2).*scalefactor , ...
+                                          coordinateCell{ii}, ...
+                                          'UniformOutput', false), ...
+                                  'SolidBoundaryOrientation', 'cw');
+    end
+end

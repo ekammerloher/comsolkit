@@ -56,7 +56,7 @@ classdef Terminal < comsolkit.Layer
                                 obj.terminalTag, 'Terminal', 2);
                             
                 terminal.selection.named(obj.boundaryTag);
-                terminal.name(obj.name);
+                terminal.label(obj.name);
                 terminal.set('TerminalType', 'Voltage');
             end
             
@@ -88,7 +88,7 @@ classdef Terminal < comsolkit.Layer
                    obj.hModel.es.tag(), obj.terminalTag); 
                
             terminal = obj.hModel.es.feature(obj.terminalTag);
-            terminal.name(obj.name);
+            terminal.label(obj.name);
         end
         
         

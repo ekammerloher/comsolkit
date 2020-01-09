@@ -72,6 +72,22 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                                                        'Extrude');
                 extrude.selection('input').set(obj.workPlaneTag);
                 
+                try
+                    % Use setters to assign extrude feature and workplane
+                    % properties.
+                    obj.zPosition = p.Results.zPosition;
+                    obj.distance = p.Results.Distance;
+
+                    % Set common name, if provided. Use setter.
+                    if ~isempty(p.Results.Name)
+                        obj.name = p.Results.Name;
+                    end
+                catch ME
+                    warning('Error caugt. Clear layer features and rethrow.');
+                    obj.delete()
+                    rethrow(ME);
+                end
+                
             else % Check extrude feature, when constructing from a tag.
                 obj.extrudeTag = p.Results.FromExtrudeTag;
                 
@@ -81,22 +97,6 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 assert(strcmp(extrudeFrom, 'workplane'), ...
                               ['Extrude feature must extrude from a ' ...
                                'workplane and not a face.']);
-            end
-            
-            try
-                % Use setters to assign extrude feature and workplane
-                % properties.
-                obj.zPosition = p.Results.zPosition;
-                obj.distance = p.Results.Distance;
-
-                % Set common name, if provided. Use setter.
-                if ~isempty(p.Results.Name)
-                    obj.name = p.Results.Name;
-                end
-            catch ME
-                warning('Error caugt. Clear layer features and rethrow.');
-                obj.delete()
-                rethrow(ME);
             end
         end
         

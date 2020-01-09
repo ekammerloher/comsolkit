@@ -55,7 +55,7 @@ classdef Gate < comsolkit.Layer
                                 obj.potentialTag, 'ElectricPotential', 2);
                             
                 potential.selection.named(obj.boundaryTag);
-                potential.name(obj.name);
+                potential.label(obj.name);
             end
             
             % Used to introduce floating potentials when voltage = NaN.
@@ -96,7 +96,7 @@ classdef Gate < comsolkit.Layer
                    obj.hModel.es.tag(), obj.potentialTag); 
                
             potential = obj.hModel.es.feature(obj.potentialTag);
-            potential.name(obj.name);
+            potential.label(obj.name);
         end
         
         
@@ -134,7 +134,7 @@ classdef Gate < comsolkit.Layer
                                obj.floatingTag, 'FloatingPotential', 2);
                             
                     floating.selection.named(obj.boundaryTag);
-                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
                 else
                     hasFloating = obj.hModel.es.feature().index( ...
                                     obj.floatingTag);
@@ -144,7 +144,7 @@ classdef Gate < comsolkit.Layer
                
                     floating = obj.hModel.es.feature(obj.floatingTag);
                     floating.active(true);
-                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
                 end
                                         
                                     
@@ -159,7 +159,7 @@ classdef Gate < comsolkit.Layer
 
                     floating = obj.hModel.es.feature(obj.floatingTag);
                     floating.active(false);
-                    floating.name([obj.FLOATING_NAME_PREFIX obj.name]);
+                    floating.label([obj.FLOATING_NAME_PREFIX obj.name]);
                 end
             end
         end
