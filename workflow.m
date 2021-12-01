@@ -56,7 +56,7 @@ for i=1:length(gl.layerArray); gl.layerArray(i).voltage = v(i); end
 gl.layerArray(1).polygonCell % This shows all polygons the gate is made out of. You can edit this freely. Change coordinates, add/remove polygons.
 gl.layerArray(1).choose_polygon_indices(); % Will draw the gate and you can select an area. A mask for the selected indices is returned.
 coords = gl.layerArray(1).polygonCell{1};
-gl.layerArray(1).polygonCell{1} = (coords.*1.1) .+ 1; % Scale and translate the whole polygon a bit.
+gl.layerArray(1).polygonCell{1} = (coords.*1.1) + 1; % Scale and translate the whole polygon a bit.
 
 %% Edit/create a gate by mouse.
 gl.add_layer(gl.layerArray(1).polygonCell, 'Screening', gl.DEFAULT_GATE_CLASS); % Will create a new gate with the same XY coordinates as Gate 1.

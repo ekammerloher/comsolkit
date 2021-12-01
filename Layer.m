@@ -16,12 +16,14 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
     properties(Constant)
         BASE_TAG_WORKPLANE = 'layer_wp'; % Base wp string for uniquetag.
         BASE_TAG_EXTRUDE = 'layer_ext'; % Base ext string for uniquetag.
+        BASE_TAG_CUMSEL = 'layer_csel'; % Base cumsel string for uniquetag.
         BASE_TAG_POLY = 'dyn_poly'; % Base poly string for uniquetag.
         WORKPLANE_NAME_PREFIX = 'wp_'; % Prefix of workplane label.
     end
     properties(Access=protected)
         extrudeTag % Tag to the extrude feature of the layer.
         workPlaneTag % Tag to the workplane feature of the layer.
+        cumSelTag % Tag to cumulative selection, if defined.
         hModel % Handle to a ComsolModel object or a derived object.
     end
     
@@ -50,6 +52,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             p = inputParser();
             p.addParameter('Name', '', @ischar);
             p.addParameter('FromExtrudeTag', '', @ischar);
+            p.addParameter('CumSel', '', @ischar);
             p.addParameter('Distance', 1, @isnumeric);
             p.addParameter('zPosition', 0, ...
                 @(x) (isnumeric(x) && isscalar(x)) || ischar(x));
@@ -97,6 +100,40 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 assert(strcmp(extrudeFrom, 'workplane'), ...
                               ['Extrude feature must extrude from a ' ...
                                'workplane and not a face.']);
+            end
+            if ~isempty(p.Results.CumSel)
+                cum_sel_name = [obj.BASE_TAG_CUMSEL '_' p.Results.CumSel];
+                obj.cumSelTag = cum_sel_name;
+                
+                itr = hModel.model.selection.iterator;
+                while itr.hasNext()
+                    feature = itr.next();
+                    featureTag = string(feature.tag());
+                    featureTag = featureTag.split('_');
+                    if length(featureTag)>1
+                        featureTag = featureTag(1:end-1).join('_');
+                    end
+                    %disp(featureTag);
+                    %disp(cum_sel_name);
+                    
+                    if isequal(featureTag, ['geom1_' cum_sel_name])
+                        extrude.set('contributeto', cum_sel_name);
+                        %disp(featureTag);
+                        %disp(feature);
+                        return;
+                    end
+                end
+                hModel.geom.selection.create(cum_sel_name, 'CumulativeSelection');
+                hModel.geom.selection(cum_sel_name).label(cum_sel_name);
+                extrude.set('contributeto', cum_sel_name);
+%                 if notfound
+%                 %obj.workPlaneTag = char(hModel.geom.feature().uniquetag( ...
+%                 %    obj.BASE_TAG_CUMSEL));
+%                     hModel.geom.selection.create('csel2', 'CumulativeSelection');
+%                     hModel.geom.selection('csel2').label('Oxide');
+%                 else
+%                     obj.wor = known_cumsel;
+%                 end
             end
         end
         
@@ -472,7 +509,52 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             catch
                 warning('Could not remove Layer %s Wrp. from server.', ...
                         obj.workPlaneTag);
-            end                
+            end
+            %obj.hModel.geom.selection(:)
+%             itr = obj.hModel.model.selection.iterator;
+%             sels_to_delete = [];
+%             while itr.hasNext()
+%                 feature = itr.next();
+%                 featureTag = string(feature.tag());
+%                 featureTag = featureTag.split('_');
+%                 if length(featureTag)>1
+%                     featureTag = featureTag(1:end-1).join('_');
+%                 end
+%                 %disp(featureTag);
+%                 if contains(featureTag, 'layer_csel')
+%                     %disp('hi');
+%                     
+%                     featureTag2 = featureTag.split('_');
+%                     featureTag2 = featureTag2(2:end).join('_');
+%                     %obj.hModel.geom.selection().remove(featureTag2);
+%                     
+%                     if length(feature.entities()) == 0
+%                         %feature.selection("delete")
+%                         %disp('hi2');
+%                         sels_to_delete = [sels_to_delete; featureTag2];
+%                     end
+%                     %sels_to_delete = [sels_to_delete; featureTag2];
+%                 end
+% %            end
+%                 %hModel.geom.selection.create(cum_sel_name, 'CumulativeSelection');
+% %                 if length(featureTag)>1
+% %                     featureTag = featureTag(1:end-1).join('_');
+% %                 end
+% %                 %disp(featureTag);
+% %                 %disp(cum_sel_name);
+% % 
+% %                 if isequal(featureTag, ['geom1_' cum_sel_name])
+% %                     extrude.set('contributeto', cum_sel_name);
+% %                     %disp(featureTag);
+% %                     %disp(feature);
+% %                     return;
+% %                 end
+%             end
+%             
+%             for l = 1:length(sels_to_delete)
+%                 obj.hModel.geom.selection().remove(sels_to_delete(l));
+%             end
+            
         end
         
         
@@ -494,6 +576,101 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
             poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
             poly.set('source', 'table');
             poly.set('table', coordinateArray);
+        end
+        
+        function polyTag = add_poly_pshape(obj, pshape)
+            % add_poly Adds a polygon defined by an n x 2 array.
+            %
+            %  polyTag = add_poly(obj, coordinateArray)
+            
+            import com.comsol.model.*;
+            
+            %{pshape.Vertices}
+            %isnumeric(pshape.Vertices) && size(pshape.Vertices,2)==2 && ~isempty(pshape.Vertices)
+            %disp('yo');
+            %assert(isnumeric({pshape.Vertices}) && ...
+            %       size(pshape.Vertices, 2) == 2 && ...
+            %       ~isempty(pshape.Vertices), ...
+            %       'Coordinates are not valid.');
+             
+            
+            for i=1:length(pshape)
+                     polyTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                     obj.BASE_TAG_POLY));
+                     poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
+                     poly.set('source', 'table');
+                 %poly.set('table', union(pshape).Vertices); 
+                 
+                     %pshape(i).Vertices
+                     poly.set('table', rmholes(pshape(i)).Vertices);  
+            end
+            %{pshape}
+            holes_p = 0;
+            if length(pshape)>1
+                for i=1:length(pshape)
+                    holes_p = holes_p + pshape(i).NumHoles;
+                end
+                holes_p
+            else
+                pshape
+                holes_p = pshape.NumHoles
+            end
+            if holes_p==0
+                %disp('noholes');
+                for i=1:length(pshape)
+                    polyTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                    obj.BASE_TAG_POLY));
+                    poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
+                    poly.set('source', 'table');
+                %poly.set('table', union(pshape).Vertices); 
+                
+                    %pshape(i).Vertices
+                    poly.set('table', pshape(i).Vertices);  
+                end
+            else
+                disp('holes');
+                
+                
+                for i=1:length(pshape)
+                    
+                    hole_shapes = holes(pshape(i));
+                    nhole_pshape = rmholes(pshape(i));
+                    polyTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                    obj.BASE_TAG_POLY));
+                    poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
+                    poly.set('source', 'table');
+                    poly.set('table', nhole_pshape.Vertices); 
+                    
+                    %polyTag = char(obj.workPlane.geom.feature().uniquetag( ...
+                    %obj.BASE_TAG_POLY));
+                    %poly = obj.workPlane.geom.feature.create(polyTag, 'Polygon');
+                    %poly.set('source', 'table');
+                %poly.set('table', union(pshape).Vertices); 
+                
+                    %pshape(i).Vertices
+                    %poly.set('table', pshape(i).Vertices);
+%                     hole_shapes
+%                     for j=1:size(hole_shapes)
+%                         polyTaghole = polyTag + "hole" + num2str(j);
+%                         poly = obj.workPlane.geom.feature.create(polyTaghole, 'Polygon');
+%                         poly.set('source', 'table');
+%                         poly.set('table', hole_shapes(j).Vertices); 
+%                         
+%                         hole_shapes(j)
+% 
+%                         polyTagdiff = polyTag + "diff" + num2str(j);
+%                         poly = obj.workPlane.geom.feature.create(polyTagdiff, 'Difference');
+%                         poly.selection('input').set(polyTag);
+%                         poly.selection('input2').set(polyTaghole);
+%                     end
+                    
+                    
+                end
+                
+                
+            end
+            
+            
         end
         
         
