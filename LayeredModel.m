@@ -105,7 +105,11 @@ classdef LayeredModel < comsolkit.ComsolModel
                 
                 for coordinateArray = coordinateArrayCell
                     % For elem = cell pattern: elem 1x1 cell, use elem{1}.
-                    obj.layerArray(end).add_poly(coordinateArray{1});
+                    if isa(coordinateArray{1}, "polyshape")
+                        obj.layerArray(end).add_poly_pshape(coordinateArray{1});
+                    else
+                        obj.layerArray(end).add_poly(coordinateArray{1});
+                    end
                 end
             end
             stopIndex = length(obj.layerArray);
@@ -218,15 +222,15 @@ classdef LayeredModel < comsolkit.ComsolModel
             %  index: Index of added layer to layerArray
             
             if nargin < 3
-                index = obj.batch_add_layer_pshape({coordinateArrayCell});
+                index = obj.batch_add_layer({coordinateArrayCell});
             else
                 name = varargin{1};
                 if isempty(name)
-                    index = obj.batch_add_layer_pshape({coordinateArrayCell}, ...
+                    index = obj.batch_add_layer({coordinateArrayCell}, ...
                                                 {}, ...
                                                 varargin{2:end});
                 else
-                    index = obj.batch_add_layer_pshape({coordinateArrayCell}, ...
+                    index = obj.batch_add_layer({coordinateArrayCell}, ...
                                                 {name}, ...
                                                 varargin{2:end});
                 end
