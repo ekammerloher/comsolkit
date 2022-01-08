@@ -27,6 +27,40 @@ classdef LayeredModel < comsolkit.ComsolModel
             % Prepare array for Layer objects.
             obj.layerArray = comsolkit.Layer.empty();
         end
+
+
+        function add_table(obj, tab, varargin)
+            % add_table Creates layers from table.
+            %
+            %  Parameter:
+            %  tab: An input gate table with columns - name, zPos, 
+            %  thickness, shape. Names are postfixed to comsol default
+            %  names.
+            %  varargin: Passed on to Layer object constructor. See help of
+            %  comsolkit.Layer.Layer
+
+            p = inputParser();
+            p.KeepUnmatched = true;
+            p.addParameter('layerClass', obj.DEFAULT_LAYER_CLASS, ...
+                           @(x) isa(x, 'function_handle'));
+            p.parse(varargin{:});
+
+            startIndex = length(obj.layerArray) + 1;
+            for i =1:height(tab)
+                obj.add_layer({tab.shape(i).regions}, ...
+                     '', ... % Leave empty for default name.
+                     p.Results.layerClass, ...
+                     'Distance', tab.thickness(i), ...
+                     'zPosition', tab.zPos(i), ...
+                     p.Unmatched);
+            end
+
+            for i=1:height(tab)
+                name = obj.layerArray(startIndex+i-1).name;
+                name = sprintf('%s: %s', name, tab.name(i));
+                obj.layerArray(startIndex+i-1).name = name;
+            end
+        end
         
         
         function [startIndex, stopIndex] = batch_add_layer(obj, ...
