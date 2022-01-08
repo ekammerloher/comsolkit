@@ -494,6 +494,7 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
         
         function delete(obj)
             % delete Removes the workplane/extrude-feature from the model.
+            % Removes the cumulative selection feature, if it is empty.
             %
             %  delete(obj)
             
@@ -510,51 +511,15 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 warning('Could not remove Layer %s Wrp. from server.', ...
                         obj.workPlaneTag);
             end
-            %obj.hModel.geom.selection(:)
-%             itr = obj.hModel.model.selection.iterator;
-%             sels_to_delete = [];
-%             while itr.hasNext()
-%                 feature = itr.next();
-%                 featureTag = string(feature.tag());
-%                 featureTag = featureTag.split('_');
-%                 if length(featureTag)>1
-%                     featureTag = featureTag(1:end-1).join('_');
-%                 end
-%                 %disp(featureTag);
-%                 if contains(featureTag, 'layer_csel')
-%                     %disp('hi');
-%                     
-%                     featureTag2 = featureTag.split('_');
-%                     featureTag2 = featureTag2(2:end).join('_');
-%                     %obj.hModel.geom.selection().remove(featureTag2);
-%                     
-%                     if length(feature.entities()) == 0
-%                         %feature.selection("delete")
-%                         %disp('hi2');
-%                         sels_to_delete = [sels_to_delete; featureTag2];
-%                     end
-%                     %sels_to_delete = [sels_to_delete; featureTag2];
-%                 end
-% %            end
-%                 %hModel.geom.selection.create(cum_sel_name, 'CumulativeSelection');
-% %                 if length(featureTag)>1
-% %                     featureTag = featureTag(1:end-1).join('_');
-% %                 end
-% %                 %disp(featureTag);
-% %                 %disp(cum_sel_name);
-% % 
-% %                 if isequal(featureTag, ['geom1_' cum_sel_name])
-% %                     extrude.set('contributeto', cum_sel_name);
-% %                     %disp(featureTag);
-% %                     %disp(feature);
-% %                     return;
-% %                 end
-%             end
-%             
-%             for l = 1:length(sels_to_delete)
-%                 obj.hModel.geom.selection().remove(sels_to_delete(l));
-%             end
-            
+            try
+                if ~isempty(obj.cumSelTag) && ...
+                   isempty(obj.hModel.geom.selection(obj.cumSelTag).objects)
+                    obj.hModel.geom.selection().remove(obj.cumSelTag);
+                end
+            catch
+                warning('Could not remove Selection %s. from server.', ...
+                        obj.cumSelTag);
+            end 
         end
         
         
@@ -610,10 +575,10 @@ classdef Layer < matlab.mixin.Heterogeneous % Necessary for polymorphy.
                 for i=1:length(pshape)
                     holes_p = holes_p + pshape(i).NumHoles;
                 end
-                holes_p
+                %holes_p
             else
-                pshape
-                holes_p = pshape.NumHoles
+                %pshape
+                %holes_p = pshape.NumHoles
             end
             if holes_p==0
                 %disp('noholes');
